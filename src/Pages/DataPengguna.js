@@ -200,14 +200,14 @@ export default function DataPengguna() {
 
   const getRoleBadge = (role) => {
     if (role === "admin") {
-      return "bg-red-50 text-red-700 border-red-100";
+      return "bg-red-500/10 text-red-300 border-red-500/20";
     }
 
     if (role === "penyuluh") {
-      return "bg-blue-50 text-blue-700 border-blue-100";
+      return "bg-blue-500/10 text-blue-300 border-blue-500/20";
     }
 
-    return "bg-emerald-50 text-emerald-700 border-emerald-100";
+    return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
   };
 
   const getRoleIcon = (role) => {
@@ -248,27 +248,27 @@ export default function DataPengguna() {
   ).length;
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-[#020617]">
         {/* TOPBAR */}
-        <div className="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 w-[400px] bg-slate-50 border border-slate-100 rounded-xl px-4 py-2">
-            <Search size={18} className="text-slate-400" />
+        <div className="h-16 bg-[#081226] border-b border-slate-800 px-8 flex items-center justify-between">
+          <div className="flex items-center gap-3 w-[420px] bg-[#0b1220] border border-slate-800 rounded-xl px-4 py-2">
+            <Search size={18} className="text-slate-500" />
             <input
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Cari nama, email, atau role pengguna..."
-              className="bg-transparent outline-none text-sm w-full text-slate-600"
+              className="bg-transparent outline-none text-sm w-full text-slate-200 placeholder:text-slate-500"
             />
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={getPengguna}
-              className="flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl text-sm hover:bg-slate-50 transition"
+              className="flex items-center gap-2 border border-slate-800 bg-[#0b1220] text-slate-200 px-4 py-2 rounded-xl text-sm hover:bg-slate-800 transition"
             >
               <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
               Refresh
@@ -276,7 +276,7 @@ export default function DataPengguna() {
 
             <button
               onClick={openTambahForm}
-              className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm"
+              className="flex items-center gap-2 bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-cyan-700 transition shadow-lg shadow-cyan-950/30"
             >
               <PlusCircle size={18} />
               Tambah Pengguna
@@ -285,24 +285,25 @@ export default function DataPengguna() {
         </div>
 
         {/* HERO */}
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
+        <section className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] border-b border-slate-800 px-8 pt-8 pb-24 text-white">
           <div>
-            <p className="text-green-100 text-sm mb-2">
+            <p className="text-cyan-300 text-sm mb-2">
               Manajemen Akun Sistem
             </p>
 
             <h1 className="text-3xl font-bold">Data Pengguna</h1>
 
-            <p className="text-green-100 mt-2 max-w-3xl">
+            <p className="text-slate-300 mt-2 max-w-3xl text-sm leading-relaxed">
               Kelola akun petani dan penyuluh pertanian agar setiap pengguna
               dapat mengakses fitur Geopanen sesuai dengan perannya. Akun admin
-              utama hanya dibuat satu kali dan tidak ditambahkan dari halaman ini.
+              utama hanya dibuat satu kali dan tidak ditambahkan dari halaman
+              ini.
             </p>
           </div>
         </section>
 
         {/* CONTENT */}
-        <section className="-mt-16 px-8 pb-8 space-y-6">
+        <section className="-mt-16 px-8 pb-8 space-y-6 h-[calc(100vh-64px)] overflow-y-auto">
           {/* STAT CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             <StatCard
@@ -339,24 +340,24 @@ export default function DataPengguna() {
           </div>
 
           {/* TABLE */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="font-bold text-slate-800">Daftar Pengguna</h2>
-                <p className="text-sm text-slate-500">
+                <h2 className="font-bold text-white">Daftar Pengguna</h2>
+                <p className="text-sm text-slate-400">
                   Menampilkan {filteredPengguna.length} dari {pengguna.length}{" "}
                   akun pengguna.
                 </p>
               </div>
 
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+              <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                 {filteredPengguna.length} Data
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-500">
+                <thead className="bg-[#0b1220] text-slate-400">
                   <tr>
                     <th className="text-left font-semibold px-6 py-4">No</th>
                     <th className="text-left font-semibold px-6 py-4">
@@ -384,32 +385,32 @@ export default function DataPengguna() {
                       return (
                         <tr
                           key={item.id}
-                          className="border-t border-slate-100 hover:bg-slate-50 transition"
+                          className="border-t border-slate-800 hover:bg-slate-800/60 transition"
                         >
-                          <td className="px-6 py-4 text-slate-500">
+                          <td className="px-6 py-4 text-slate-400">
                             {index + 1}
                           </td>
 
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center">
                                 <RoleIcon size={18} />
                               </div>
 
                               <div>
-                                <p className="font-semibold text-slate-800">
+                                <p className="font-semibold text-white">
                                   {item.name}
                                 </p>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-slate-500">
                                   ID Pengguna: {item.id}
                                 </p>
                               </div>
                             </div>
                           </td>
 
-                          <td className="px-6 py-4 text-slate-600">
+                          <td className="px-6 py-4 text-slate-300">
                             <div className="flex items-center gap-2">
-                              <Mail size={16} className="text-emerald-600" />
+                              <Mail size={16} className="text-cyan-300" />
                               {item.email}
                             </div>
                           </td>
@@ -424,11 +425,11 @@ export default function DataPengguna() {
                             </span>
                           </td>
 
-                          <td className="px-6 py-4 text-slate-600">
+                          <td className="px-6 py-4 text-slate-300">
                             <div className="flex items-center gap-2">
                               <CalendarDays
                                 size={16}
-                                className="text-emerald-600"
+                                className="text-cyan-300"
                               />
                               {formatTanggal(item.created_at)}
                             </div>
@@ -437,7 +438,7 @@ export default function DataPengguna() {
                           <td className="px-6 py-4">
                             {isAdmin ? (
                               <div className="text-center">
-                                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold">
+                                <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-semibold border border-slate-700">
                                   Admin utama dikunci
                                 </span>
                               </div>
@@ -445,7 +446,7 @@ export default function DataPengguna() {
                               <div className="flex items-center justify-center gap-2">
                                 <button
                                   onClick={() => handleEdit(item)}
-                                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 transition"
+                                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 transition"
                                   title="Edit Pengguna"
                                 >
                                   <Pencil size={17} />
@@ -453,7 +454,7 @@ export default function DataPengguna() {
 
                                 <button
                                   onClick={() => handleDelete(item)}
-                                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition"
+                                  className="w-9 h-9 flex items-center justify-center rounded-xl border border-red-500/30 text-red-300 hover:bg-red-500/10 transition"
                                   title="Hapus Pengguna"
                                 >
                                   <Trash2 size={17} />
@@ -482,14 +483,14 @@ export default function DataPengguna() {
 
         {/* MODAL FORM */}
         {showForm && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex justify-center items-center z-50 px-4">
-            <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-6 py-5 text-white flex justify-between items-center">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 px-4">
+            <div className="bg-[#081226] border border-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] px-6 py-5 text-white flex justify-between items-center border-b border-slate-800">
                 <div>
                   <h2 className="text-xl font-bold">
                     {editId ? "Edit Pengguna" : "Tambah Pengguna"}
                   </h2>
-                  <p className="text-sm text-green-100 mt-1">
+                  <p className="text-sm text-slate-300 mt-1">
                     Lengkapi data akun petani atau penyuluh pertanian.
                   </p>
                 </div>
@@ -497,7 +498,7 @@ export default function DataPengguna() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
                 >
                   <X size={20} />
                 </button>
@@ -505,7 +506,6 @@ export default function DataPengguna() {
 
               <form onSubmit={handleSubmit} autoComplete="off">
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Dummy input untuk mengurangi autofill browser */}
                   <input
                     type="text"
                     name="fake_user"
@@ -521,23 +521,16 @@ export default function DataPengguna() {
                     tabIndex="-1"
                   />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">
-                      Nama
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Masukkan nama pengguna"
-                      autoComplete="off"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
-                    />
-                  </div>
+                  <InputText
+                    label="Nama"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Masukkan nama pengguna"
+                  />
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">
                       Email
                     </label>
                     <input
@@ -554,12 +547,12 @@ export default function DataPengguna() {
                       autoComplete="new-email"
                       autoCorrect="off"
                       spellCheck="false"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">
                       Password
                     </label>
                     <input
@@ -578,12 +571,12 @@ export default function DataPengguna() {
                           : "Masukkan password"
                       }
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                    <label className="block text-sm font-semibold text-slate-300 mb-1">
                       Role
                     </label>
                     <select
@@ -591,7 +584,7 @@ export default function DataPengguna() {
                       value={form.role}
                       onChange={handleChange}
                       autoComplete="off"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                      className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500"
                     >
                       <option value="">Pilih Role</option>
                       <option value="petani">Petani</option>
@@ -600,11 +593,11 @@ export default function DataPengguna() {
                   </div>
                 </div>
 
-                <div className="px-6 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <div className="px-6 py-5 bg-[#0b1220] border-t border-slate-800 flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-white transition"
+                    className="px-5 py-2.5 border border-slate-700 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800 transition"
                   >
                     Batal
                   </button>
@@ -612,7 +605,7 @@ export default function DataPengguna() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition flex items-center gap-2 disabled:opacity-60"
+                    className="px-5 py-2.5 bg-cyan-600 text-white rounded-xl text-sm font-semibold hover:bg-cyan-700 transition flex items-center gap-2 disabled:opacity-60"
                   >
                     <Save size={17} />
                     {loading ? "Menyimpan..." : editId ? "Update" : "Simpan"}
@@ -627,21 +620,41 @@ export default function DataPengguna() {
   );
 }
 
+function InputText({ label, name, value, onChange, placeholder }) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-slate-300 mb-1">
+        {label}
+      </label>
+      <input
+        type="text"
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete="off"
+        className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500"
+      />
+    </div>
+  );
+}
+
 function StatCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    green: "bg-green-100 text-green-700",
-    blue: "bg-blue-100 text-blue-700",
-    red: "bg-red-100 text-red-700",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    green: "bg-green-500/10 text-green-300 border border-green-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border border-blue-500/20",
+    red: "bg-red-500/10 text-red-300 border border-red-500/20",
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-5 hover:-translate-y-1 transition">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-800 mt-2">{value}</h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h3 className="text-2xl font-bold text-white mt-2">{value}</h3>
+          <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
         </div>
 
         <div

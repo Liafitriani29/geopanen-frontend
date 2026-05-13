@@ -5,13 +5,11 @@ import {
   Users,
   LineChart,
   BarChart3,
-  CloudSun,
   FileText,
   Leaf,
-  Lightbulb,
   LogOut,
-  Activity,
   Map as MapIcon,
+  CloudSun,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -33,27 +31,27 @@ export default function Sidebar() {
         icon: Database,
       },
       {
-        name: "Prediksi Panen TES",
+        name: "Analisis Prediksi TES",
         path: "/prediksi",
         icon: LineChart,
       },
       {
-        name: "Evaluasi Aktual TES",
+        name: "Evaluasi MAPE",
         path: "/deviasi",
         icon: BarChart3,
       },
       {
-        name: "GIS Monitoring",
-        path: "/cuaca",
+        name: "Peta GIS Prediksi",
+        path: "/admin/peta-gis-prediksi",
         icon: MapIcon,
       },
       {
-        name: "Rekomendasi",
-        path: "/rekomendasi",
-        icon: Lightbulb,
+        name: "Pemantauan Cuaca",
+        path: "/cuaca",
+        icon: CloudSun,
       },
       {
-        name: "Laporan",
+        name: "Laporan Monitoring",
         path: "/laporan",
         icon: FileText,
       },
@@ -76,14 +74,9 @@ export default function Sidebar() {
         icon: LineChart,
       },
       {
-        name: "Kondisi Lingkungan",
+        name: "Pemantauan Lingkungan",
         path: "/lingkungan",
         icon: CloudSun,
-      },
-      {
-        name: "Rekomendasi",
-        path: "/petani/rekomendasi",
-        icon: Lightbulb,
       },
     ],
 
@@ -94,22 +87,12 @@ export default function Sidebar() {
         icon: LayoutDashboard,
       },
       {
-        name: "Monitoring Prediksi",
+        name: "Pemantauan Wilayah",
         path: "/penyuluh/analisis-prediksi",
-        icon: Activity,
+        icon: MapIcon,
       },
       {
-        name: "Evaluasi Aktual TES",
-        path: "/penyuluh/analisis-evaluasi",
-        icon: BarChart3,
-      },
-      {
-        name: "Rekomendasi",
-        path: "/penyuluh/rekomendasi",
-        icon: Lightbulb,
-      },
-      {
-        name: "Laporan",
+        name: "Laporan Monitoring",
         path: "/penyuluh/laporan",
         icon: FileText,
       },
@@ -141,7 +124,7 @@ export default function Sidebar() {
             Geopanen
           </h1>
           <p className="text-xs text-emerald-300">
-            Sistem Prediksi Panen Padi
+            Prediksi & Monitoring Panen
           </p>
         </div>
       </div>

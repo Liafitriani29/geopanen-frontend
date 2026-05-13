@@ -260,32 +260,30 @@ export default function HasilPrediksiPetani() {
 
   const getKategoriBadge = (kategori) => {
     if (kategori === "Tinggi") {
-      return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
     }
 
     if (kategori === "Rendah") {
-      return "bg-red-50 text-red-700 border-red-100";
+      return "bg-red-500/10 text-red-300 border-red-500/20";
     }
 
     if (kategori === "Sedang") {
-      return "bg-yellow-50 text-yellow-700 border-yellow-100";
+      return "bg-yellow-500/10 text-yellow-300 border-yellow-500/20";
     }
 
-    return "bg-slate-50 text-slate-700 border-slate-100";
+    return "bg-slate-800 text-slate-300 border-slate-700";
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-[#020617]">
         {/* TOPBAR */}
-        <div className="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between">
+        <div className="h-16 bg-[#081226] border-b border-slate-800 px-8 flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-slate-800">
-              Hasil Prediksi Petani
-            </h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="font-bold text-white">Hasil Prediksi Petani</h2>
+            <p className="text-xs text-slate-400">
               Informasi hasil prediksi panen, cuaca, dan rekomendasi sistem.
             </p>
           </div>
@@ -293,7 +291,7 @@ export default function HasilPrediksiPetani() {
           <button
             onClick={getHasilPrediksiPetani}
             disabled={loading}
-            className="flex items-center gap-2 border border-slate-200 px-4 py-2.5 rounded-xl text-sm hover:bg-slate-50 transition disabled:opacity-60"
+            className="flex items-center gap-2 border border-slate-800 bg-[#0b1220] text-slate-200 px-4 py-2.5 rounded-xl text-sm hover:bg-slate-800 transition disabled:opacity-60"
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             {loading ? "Memuat..." : "Refresh"}
@@ -301,30 +299,34 @@ export default function HasilPrediksiPetani() {
         </div>
 
         {/* HERO */}
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
+        <section className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] border-b border-slate-800 px-8 pt-8 pb-24 text-white">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div>
-              <p className="text-green-100 text-sm mb-2">
+              <p className="text-cyan-300 text-sm mb-2">
                 Informasi Prediksi Panen
               </p>
 
               <h1 className="text-3xl font-bold">Hasil Prediksi Panen</h1>
 
-              <p className="text-green-100 mt-2 max-w-3xl">
+              <p className="text-slate-300 mt-2 max-w-3xl text-sm leading-relaxed">
                 Petani dapat melihat prediksi produksi padi wilayah, kondisi
                 cuaca terbaru, dan rekomendasi tindakan dari sistem.
               </p>
             </div>
 
-            <div className="bg-white/15 border border-white/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
+            <div className="bg-white/5 border border-cyan-500/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center">
                   <Leaf size={22} />
                 </div>
 
                 <div>
-                  <p className="text-sm text-green-100">Status Data</p>
-                  <h3 className="font-bold">
+                  <p className="text-sm text-slate-400">Status Data</p>
+                  <h3
+                    className={`font-bold ${
+                      loading ? "text-yellow-300" : "text-emerald-300"
+                    }`}
+                  >
                     {loading ? "Memuat Data" : "Data Tersedia"}
                   </h3>
                 </div>
@@ -334,18 +336,18 @@ export default function HasilPrediksiPetani() {
         </section>
 
         {/* CONTENT */}
-        <section className="-mt-16 px-8 pb-8 space-y-6">
+        <section className="-mt-16 px-8 pb-8 space-y-6 h-[calc(100vh-64px)] overflow-y-auto">
           {loading && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-5">
+            <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-10 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
                 <RefreshCw size={30} className="animate-spin" />
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800 mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Memuat Hasil Prediksi...
               </h2>
 
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Sistem sedang mengambil data prediksi, evaluasi, cuaca, dan
                 rekomendasi.
               </p>
@@ -353,22 +355,24 @@ export default function HasilPrediksiPetani() {
           )}
 
           {error && !loading && (
-            <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6">
+            <div className="bg-red-500/10 rounded-2xl border border-red-500/30 shadow-lg shadow-black/20 p-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-700 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 flex items-center justify-center shrink-0">
                   <AlertTriangle size={24} />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-red-600">
+                  <h2 className="text-xl font-bold text-red-300">
                     Gagal Memuat Hasil Prediksi
                   </h2>
 
-                  <p className="text-slate-600 mt-2">{error}</p>
+                  <p className="text-red-100/80 mt-2">{error}</p>
 
-                  <p className="text-sm text-slate-500 mt-3">
+                  <p className="text-sm text-slate-400 mt-3">
                     Pastikan backend Laravel sudah berjalan dan endpoint{" "}
-                    <span className="font-semibold">/api/tes/prediksi</span>{" "}
+                    <span className="font-semibold text-slate-200">
+                      /api/tes/prediksi
+                    </span>{" "}
                     sudah aktif.
                   </p>
                 </div>
@@ -451,13 +455,13 @@ export default function HasilPrediksiPetani() {
 
               {/* GRAFIK DAN CUACA */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div className="xl:col-span-2 bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                   <div className="flex items-start justify-between gap-4 mb-5">
                     <div>
-                      <h2 className="font-bold text-slate-800">
+                      <h2 className="font-bold text-white">
                         Grafik Prediksi Panen TES
                       </h2>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-400">
                         Menampilkan prediksi produksi padi periode mendatang
                         berdasarkan metode TES.
                       </p>
@@ -487,7 +491,7 @@ export default function HasilPrediksiPetani() {
                         <CartesianGrid
                           strokeDasharray="3 3"
                           vertical={false}
-                          stroke="#e5e7eb"
+                          stroke="#1e293b"
                         />
 
                         <XAxis
@@ -496,24 +500,29 @@ export default function HasilPrediksiPetani() {
                           angle={-35}
                           textAnchor="end"
                           height={70}
-                          tick={{ fontSize: 11, fill: "#64748b" }}
+                          tick={{ fontSize: 11, fill: "#94a3b8" }}
                           axisLine={false}
                           tickLine={false}
                         />
 
                         <YAxis
-                          tick={{ fontSize: 12, fill: "#64748b" }}
+                          tick={{ fontSize: 12, fill: "#94a3b8" }}
                           axisLine={false}
                           tickLine={false}
                         />
 
                         <Tooltip
-                          cursor={{ fill: "rgba(16, 185, 129, 0.08)" }}
+                          cursor={{ fill: "rgba(6, 182, 212, 0.08)" }}
                           contentStyle={{
+                            backgroundColor: "#0f172a",
                             borderRadius: "14px",
-                            border: "1px solid #d1fae5",
-                            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+                            border: "1px solid #1e293b",
+                            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                             fontSize: "13px",
+                            color: "#e2e8f0",
+                          }}
+                          labelStyle={{
+                            color: "#e2e8f0",
                           }}
                           formatter={(value) => [
                             `${formatAngka(value)} Ton`,
@@ -525,7 +534,7 @@ export default function HasilPrediksiPetani() {
                         <Bar
                           dataKey="prediksi"
                           name="Prediksi TES"
-                          fill="#059669"
+                          fill="#06b6d4"
                           radius={[10, 10, 0, 0]}
                         />
                       </BarChart>
@@ -533,8 +542,8 @@ export default function HasilPrediksiPetani() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                  <h2 className="font-bold text-slate-800 mb-4">
+                <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
+                  <h2 className="font-bold text-white mb-4">
                     Kondisi Lingkungan
                   </h2>
 
@@ -573,11 +582,11 @@ export default function HasilPrediksiPetani() {
                     />
                   </div>
 
-                  <div className="mt-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                    <p className="text-sm font-semibold text-emerald-700">
+                  <div className="mt-6 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-4">
+                    <p className="text-sm font-semibold text-cyan-300">
                       Catatan Cuaca
                     </p>
-                    <p className="text-sm text-emerald-700 mt-1 leading-relaxed">
+                    <p className="text-sm text-slate-300 mt-1 leading-relaxed">
                       {cuaca?.catatan_cuaca ||
                         "Catatan cuaca belum tersedia."}
                     </p>
@@ -586,23 +595,23 @@ export default function HasilPrediksiPetani() {
               </div>
 
               {/* REKOMENDASI */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center justify-center shrink-0">
                     <Lightbulb size={24} />
                   </div>
 
                   <div>
-                    <h2 className="font-bold text-slate-800">
+                    <h2 className="font-bold text-white">
                       Rekomendasi Utama
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-400 mt-1">
                       Rekomendasi ditampilkan untuk periode prediksi berikutnya
                       yang belum dievaluasi.
                     </p>
 
-                    <div className="mt-4 bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                      <p className="font-semibold text-emerald-700 leading-relaxed">
+                    <div className="mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4">
+                      <p className="font-semibold text-emerald-300 leading-relaxed">
                         {rekomendasiTeks}
                       </p>
                     </div>
@@ -611,11 +620,11 @@ export default function HasilPrediksiPetani() {
               </div>
 
               {/* AKSI CEPAT */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div>
-                    <h2 className="font-bold text-slate-800">Aksi Cepat</h2>
-                    <p className="text-sm text-slate-500">
+                    <h2 className="font-bold text-white">Aksi Cepat</h2>
+                    <p className="text-sm text-slate-400">
                       Petani hanya melihat informasi prediksi, cuaca, dan
                       rekomendasi.
                     </p>
@@ -628,7 +637,7 @@ export default function HasilPrediksiPetani() {
                     description="Kembali ke dashboard"
                     icon={BarChart3}
                     tone="emerald"
-                    onClick={() => navigate("/petani/dashboard")}
+                    onClick={() => navigate("/petani")}
                   />
 
                   <QuickAction
@@ -650,25 +659,25 @@ export default function HasilPrediksiPetani() {
               </div>
 
               {/* TABEL PREDIKSI */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
                   <div>
-                    <h2 className="font-bold text-slate-800">
+                    <h2 className="font-bold text-white">
                       Daftar Hasil Prediksi
                     </h2>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-400">
                       Daftar prediksi yang dapat dilihat oleh petani.
                     </p>
                   </div>
 
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                     {dataPrediksiUntukPetani.length} Periode
                   </span>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
+                    <thead className="bg-[#0b1220] text-slate-400">
                       <tr>
                         <th className="text-left font-semibold px-6 py-4">
                           Periode
@@ -695,13 +704,13 @@ export default function HasilPrediksiPetani() {
                           return (
                             <tr
                               key={`${item.tahun}-${item.bulan}-${index}`}
-                              className="border-t border-slate-100 hover:bg-slate-50"
+                              className="border-t border-slate-800 hover:bg-slate-800/60"
                             >
-                              <td className="px-6 py-4 font-medium text-slate-700">
+                              <td className="px-6 py-4 font-medium text-white">
                                 {namaBulan(item.bulan)} {item.tahun}
                               </td>
 
-                              <td className="px-6 py-4 text-slate-600">
+                              <td className="px-6 py-4 text-slate-300">
                                 {formatAngka(item.prediksi)} Ton
                               </td>
 
@@ -715,7 +724,7 @@ export default function HasilPrediksiPetani() {
                                 </span>
                               </td>
 
-                              <td className="px-6 py-4 text-slate-500">
+                              <td className="px-6 py-4 text-slate-400">
                                 Informasi awal untuk perencanaan kegiatan
                                 pertanian.
                               </td>
@@ -738,14 +747,14 @@ export default function HasilPrediksiPetani() {
               </div>
 
               {/* CATATAN */}
-              <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex gap-4">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center shrink-0">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 p-5 rounded-2xl flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center justify-center shrink-0">
                   <Info size={22} />
                 </div>
 
                 <div>
-                  <h2 className="font-bold text-emerald-800 mb-1">Catatan</h2>
-                  <p className="text-sm text-emerald-700 leading-relaxed">
+                  <h2 className="font-bold text-emerald-300 mb-1">Catatan</h2>
+                  <p className="text-sm text-emerald-100/80 leading-relaxed">
                     Prediksi ini berasal dari data produksi bulanan Kabupaten
                     Sukoharjo. Informasi ini digunakan sebagai gambaran awal,
                     sehingga petani tetap perlu memperhatikan kondisi lahan,
@@ -763,21 +772,23 @@ export default function HasilPrediksiPetani() {
 
 function StatCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    green: "bg-green-100 text-green-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    orange: "bg-orange-100 text-orange-700",
-    blue: "bg-blue-100 text-blue-700",
-    red: "bg-red-100 text-red-700",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    green: "bg-green-500/10 text-green-300 border border-green-500/20",
+    yellow: "bg-yellow-500/10 text-yellow-300 border border-yellow-500/20",
+    orange:
+      "bg-orange-500/10 text-orange-300 border border-orange-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border border-blue-500/20",
+    red: "bg-red-500/10 text-red-300 border border-red-500/20",
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-5 hover:-translate-y-1 transition">
       <div className="flex justify-between items-start gap-4">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-2xl font-bold mt-2 text-slate-800">{value}</h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h3 className="text-2xl font-bold mt-2 text-white">{value}</h3>
+          <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
         </div>
 
         <div
@@ -794,28 +805,31 @@ function StatCard({ title, value, subtitle, icon: Icon, tone }) {
 
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div className="flex items-center gap-2 text-slate-500 text-sm">
-        <Icon size={16} className="text-emerald-600" />
+    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center gap-2 text-slate-400 text-sm">
+        <Icon size={16} className="text-cyan-300" />
         {label}
       </div>
 
-      <span className="text-sm font-bold text-slate-800">{value}</span>
+      <span className="text-sm font-bold text-white">{value}</span>
     </div>
   );
 }
 
 function QuickAction({ title, description, icon: Icon, tone, onClick }) {
   const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    orange: "bg-orange-100 text-orange-700",
-    purple: "bg-purple-100 text-purple-700",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    orange:
+      "bg-orange-500/10 text-orange-300 border border-orange-500/20",
+    purple:
+      "bg-purple-500/10 text-purple-300 border border-purple-500/20",
   };
 
   return (
     <button
       onClick={onClick}
-      className="text-left p-5 border border-slate-100 rounded-2xl hover:bg-slate-50 hover:-translate-y-1 transition group"
+      className="text-left p-5 border border-slate-800 bg-[#0b1220] rounded-2xl hover:bg-slate-800 hover:-translate-y-1 transition group"
     >
       <div
         className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${
@@ -827,13 +841,13 @@ function QuickAction({ title, description, icon: Icon, tone, onClick }) {
 
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="font-bold text-slate-800">{title}</h3>
+          <h3 className="font-bold text-white">{title}</h3>
           <p className="text-xs text-slate-500 mt-1">{description}</p>
         </div>
 
         <ArrowRight
           size={18}
-          className="text-slate-400 group-hover:text-emerald-600"
+          className="text-slate-500 group-hover:text-cyan-300"
         />
       </div>
     </button>

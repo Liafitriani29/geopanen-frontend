@@ -18,6 +18,7 @@ import Laporan from "./Pages/Laporan";
 import DataPengguna from "./Pages/DataPengguna";
 import IntegrasiCuaca from "./Pages/IntegrasiCuaca";
 import Rekomendasi from "./Pages/Rekomendasi";
+import PetaGISPrediksi from "./Pages/PetaGISPrediksi";
 
 // PETANI
 import PetaniDashboard from "./Pages/PetaniDashboard";
@@ -59,8 +60,11 @@ function App() {
         <Route path="/pengguna" element={<DataPengguna />} />
 
         {/* GIS MONITORING ADMIN */}
-        {/* File tetap IntegrasiCuaca.js, tapi isi halamannya GIS */}
         <Route path="/cuaca" element={<IntegrasiCuaca />} />
+
+        {/* PETA GIS PREDIKSI */}
+        <Route path="/peta-gis-prediksi" element={<PetaGISPrediksi />} />
+        <Route path="/admin/peta-gis-prediksi" element={<PetaGISPrediksi />} />
 
         <Route path="/rekomendasi" element={<Rekomendasi />} />
 

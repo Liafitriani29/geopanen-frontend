@@ -105,7 +105,6 @@ export default function PenyuluhDashboard() {
 
       if (resCatatan.status === "fulfilled") {
         const payloadCatatan = resCatatan.value.data?.data || [];
-
         setDaftarCatatan(Array.isArray(payloadCatatan) ? payloadCatatan : []);
       } else {
         setDaftarCatatan([]);
@@ -113,8 +112,7 @@ export default function PenyuluhDashboard() {
     } catch (err) {
       console.error(err);
       setError(
-        err.message ||
-          "Gagal mengambil data dashboard penyuluh dari backend."
+        err.message || "Gagal mengambil data dashboard penyuluh dari backend."
       );
     } finally {
       setLoading(false);
@@ -125,7 +123,6 @@ export default function PenyuluhDashboard() {
     try {
       const res = await axios.get(API_CATATAN);
       const payload = res.data?.data || [];
-
       setDaftarCatatan(Array.isArray(payload) ? payload : []);
     } catch (err) {
       console.error(err);
@@ -237,12 +234,12 @@ export default function PenyuluhDashboard() {
 
   const statusModelClass =
     statusModel === "Akurat"
-      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+      ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
       : statusModel === "Cukup"
-      ? "bg-yellow-50 text-yellow-700 border-yellow-100"
+      ? "bg-yellow-500/10 text-yellow-300 border-yellow-500/20"
       : statusModel === "Perlu Evaluasi" || statusModel === "Perlu Perbaikan"
-      ? "bg-red-50 text-red-700 border-red-100"
-      : "bg-slate-50 text-slate-700 border-slate-100";
+      ? "bg-red-500/10 text-red-300 border-red-500/20"
+      : "bg-slate-800 text-slate-300 border-slate-700";
 
   const StatusIcon =
     statusModel === "Akurat"
@@ -268,7 +265,6 @@ export default function PenyuluhDashboard() {
     null;
 
   const prediksiTabel = dataPrediksiUntukPenyuluh.slice(0, 6);
-
   const riwayatCatatanTampil = daftarCatatan.slice(0, 5);
 
   const rekomendasiDashboard =
@@ -329,45 +325,46 @@ export default function PenyuluhDashboard() {
 
   const getStatusBadge = (status) => {
     if (status === "Akurat") {
-      return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
     }
 
     if (status === "Cukup") {
-      return "bg-yellow-50 text-yellow-700 border-yellow-100";
+      return "bg-yellow-500/10 text-yellow-300 border-yellow-500/20";
     }
 
     if (status === "Perlu Evaluasi") {
-      return "bg-red-50 text-red-700 border-red-100";
+      return "bg-red-500/10 text-red-300 border-red-500/20";
     }
 
-    return "bg-slate-50 text-slate-700 border-slate-100";
+    return "bg-slate-800 text-slate-300 border-slate-700";
   };
 
   const getKategoriBadge = (kategori) => {
     if (kategori === "Tinggi") {
-      return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      return "bg-emerald-500/10 text-emerald-300 border-emerald-500/20";
     }
 
     if (kategori === "Sedang") {
-      return "bg-yellow-50 text-yellow-700 border-yellow-100";
+      return "bg-yellow-500/10 text-yellow-300 border-yellow-500/20";
     }
 
     if (kategori === "Rendah") {
-      return "bg-red-50 text-red-700 border-red-100";
+      return "bg-red-500/10 text-red-300 border-red-500/20";
     }
 
-    return "bg-slate-50 text-slate-700 border-slate-100";
+    return "bg-slate-800 text-slate-300 border-slate-700";
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
-        <div className="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between">
+      <main className="flex-1 overflow-hidden bg-[#020617]">
+        {/* TOPBAR */}
+        <div className="h-16 bg-[#081226] border-b border-slate-800 px-8 flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-slate-800">Dashboard Penyuluh</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="font-bold text-white">Dashboard Penyuluh</h2>
+            <p className="text-xs text-slate-400">
               Monitoring prediksi TES, evaluasi aktual, cuaca, dan rekomendasi.
             </p>
           </div>
@@ -375,17 +372,18 @@ export default function PenyuluhDashboard() {
           <button
             onClick={getDashboardPenyuluh}
             disabled={loading}
-            className="flex items-center gap-2 border border-slate-200 px-4 py-2.5 rounded-xl text-sm hover:bg-slate-50 transition disabled:opacity-60"
+            className="flex items-center gap-2 border border-slate-800 bg-[#0b1220] text-slate-200 px-4 py-2.5 rounded-xl text-sm hover:bg-slate-800 transition disabled:opacity-60"
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
             {loading ? "Memuat..." : "Refresh"}
           </button>
         </div>
 
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
+        {/* HERO */}
+        <section className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] border-b border-slate-800 px-8 pt-8 pb-24 text-white">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div>
-              <p className="text-green-100 text-sm mb-2">
+              <p className="text-cyan-300 text-sm mb-2">
                 Monitoring Prediksi Produksi Padi
               </p>
 
@@ -393,22 +391,26 @@ export default function PenyuluhDashboard() {
                 Dashboard Penyuluh Pertanian
               </h1>
 
-              <p className="text-green-100 mt-2 max-w-3xl">
+              <p className="text-slate-300 mt-2 max-w-3xl text-sm leading-relaxed">
                 Halaman ini membantu penyuluh melihat hasil prediksi produksi
                 padi Kabupaten Sukoharjo, evaluasi aktual TES, periode yang
                 perlu perhatian, kondisi cuaca, dan rekomendasi pendampingan.
               </p>
             </div>
 
-            <div className="bg-white/15 border border-white/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
+            <div className="bg-white/5 border border-cyan-500/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center">
                   <Leaf size={22} />
                 </div>
 
                 <div>
-                  <p className="text-sm text-green-100">Status Dashboard</p>
-                  <h3 className="font-bold">
+                  <p className="text-sm text-slate-400">Status Dashboard</p>
+                  <h3
+                    className={`font-bold ${
+                      loading ? "text-yellow-300" : "text-emerald-300"
+                    }`}
+                  >
                     {loading ? "Memuat Data" : "Data Tersedia"}
                   </h3>
                 </div>
@@ -417,18 +419,19 @@ export default function PenyuluhDashboard() {
           </div>
         </section>
 
-        <section className="-mt-16 px-8 pb-8 space-y-6">
+        {/* CONTENT */}
+        <section className="-mt-16 px-8 pb-8 space-y-6 h-[calc(100vh-64px)] overflow-y-auto">
           {loading && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-5">
+            <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-10 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
                 <RefreshCw size={30} className="animate-spin" />
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800 mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Memuat Dashboard Penyuluh...
               </h2>
 
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Sistem sedang mengambil data prediksi, evaluasi, cuaca,
                 rekomendasi, dan catatan dari backend.
               </p>
@@ -436,20 +439,20 @@ export default function PenyuluhDashboard() {
           )}
 
           {error && !loading && (
-            <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6">
+            <div className="bg-red-500/10 rounded-2xl border border-red-500/30 shadow-lg shadow-black/20 p-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-700 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 flex items-center justify-center shrink-0">
                   <AlertTriangle size={24} />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-red-600">
+                  <h2 className="text-xl font-bold text-red-300">
                     Gagal Memuat Dashboard
                   </h2>
 
-                  <p className="text-slate-600 mt-2">{error}</p>
+                  <p className="text-red-100/80 mt-2">{error}</p>
 
-                  <p className="text-sm text-slate-500 mt-3">
+                  <p className="text-sm text-slate-400 mt-3">
                     Pastikan backend Laravel berjalan dan endpoint prediksi,
                     evaluasi, rekomendasi, serta catatan penyuluh sudah aktif.
                   </p>
@@ -460,6 +463,7 @@ export default function PenyuluhDashboard() {
 
           {!loading && !error && (
             <>
+              {/* STAT CARD */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                 <StatCard
                   title="Data Historis"
@@ -498,6 +502,7 @@ export default function PenyuluhDashboard() {
                 />
               </div>
 
+              {/* INSIGHT */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <InsightCard
                   title="Prediksi Berikutnya"
@@ -551,15 +556,16 @@ export default function PenyuluhDashboard() {
                 />
               </div>
 
+              {/* RINGKASAN DAN CUACA */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div className="xl:col-span-2 bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center shrink-0">
                       <Activity size={23} />
                     </div>
 
                     <div>
-                      <h2 className="text-lg font-bold text-slate-800 mb-3">
+                      <h2 className="text-lg font-bold text-white mb-3">
                         Ringkasan Evaluasi Prediksi
                       </h2>
 
@@ -586,7 +592,7 @@ export default function PenyuluhDashboard() {
                         </p>
                       </div>
 
-                      <p className="text-sm text-slate-500 mt-4 leading-relaxed">
+                      <p className="text-sm text-slate-400 mt-4 leading-relaxed">
                         Penyuluh dapat menggunakan informasi ini untuk melihat
                         periode yang perlu pendampingan lebih lanjut, terutama
                         jika terdapat deviasi tinggi atau prediksi rendah.
@@ -595,10 +601,8 @@ export default function PenyuluhDashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                  <h2 className="font-bold text-slate-800 mb-4">
-                    Kondisi Cuaca
-                  </h2>
+                <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
+                  <h2 className="font-bold text-white mb-4">Kondisi Cuaca</h2>
 
                   <div className="space-y-4">
                     <InfoRow
@@ -635,11 +639,11 @@ export default function PenyuluhDashboard() {
                     />
                   </div>
 
-                  <div className="mt-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                    <p className="text-sm font-semibold text-emerald-700">
+                  <div className="mt-6 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-4">
+                    <p className="text-sm font-semibold text-cyan-300">
                       Catatan Cuaca
                     </p>
-                    <p className="text-sm text-emerald-700 mt-1 leading-relaxed">
+                    <p className="text-sm text-slate-300 mt-1 leading-relaxed">
                       {cuaca?.catatan_cuaca ||
                         "Data cuaca digunakan sebagai pendukung rekomendasi penyuluh."}
                     </p>
@@ -647,24 +651,25 @@ export default function PenyuluhDashboard() {
                 </div>
               </div>
 
+              {/* REKOMENDASI */}
               {rekomendasiPrioritas && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-yellow-100 text-yellow-700 flex items-center justify-center shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 flex items-center justify-center shrink-0">
                       <Target size={23} />
                     </div>
 
                     <div>
-                      <h2 className="text-lg font-bold text-slate-800">
+                      <h2 className="text-lg font-bold text-white">
                         Rekomendasi Pendampingan Prioritas
                       </h2>
 
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="text-sm text-slate-400 mt-1">
                         Rekomendasi dipilih dari periode prediksi yang belum
                         dievaluasi.
                       </p>
 
-                      <div className="mt-4 border border-emerald-100 bg-emerald-50 rounded-2xl p-4">
+                      <div className="mt-4 border border-emerald-500/20 bg-emerald-500/10 rounded-2xl p-4">
                         <div className="flex flex-wrap gap-3 mb-3">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold border ${getKategoriBadge(
@@ -674,17 +679,17 @@ export default function PenyuluhDashboard() {
                             Prediksi {rekomendasiPrioritas.kategori_prediksi}
                           </span>
 
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-emerald-700 border border-emerald-100">
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#020617] text-cyan-300 border border-cyan-500/20">
                             {namaBulan(rekomendasiPrioritas.bulan)}{" "}
                             {rekomendasiPrioritas.tahun}
                           </span>
 
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-700 border border-slate-100">
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#020617] text-slate-300 border border-slate-700">
                             {formatAngka(rekomendasiPrioritas.prediksi)} Ton
                           </span>
                         </div>
 
-                        <p className="text-sm text-emerald-700 leading-relaxed font-semibold">
+                        <p className="text-sm text-emerald-300 leading-relaxed font-semibold">
                           {rekomendasiPrioritas.rekomendasi ||
                             rekomendasiDashboard}
                         </p>
@@ -694,14 +699,15 @@ export default function PenyuluhDashboard() {
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              {/* TABEL EVALUASI */}
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <h2 className="font-bold text-slate-800">
+                    <h2 className="font-bold text-white">
                       Evaluasi Aktual Prediksi TES
                     </h2>
 
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-400">
                       Menampilkan perbandingan prediksi TES dengan aktual
                       produksi bulanan yang sudah tersedia.
                     </p>
@@ -711,7 +717,7 @@ export default function PenyuluhDashboard() {
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="border border-slate-200 bg-white px-4 py-2 rounded-xl text-sm outline-none"
+                      className="border border-slate-800 bg-[#020617] text-slate-200 px-4 py-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-cyan-500/30"
                     >
                       <option value="Semua">Semua Status</option>
                       <option value="Akurat">Akurat</option>
@@ -719,7 +725,7 @@ export default function PenyuluhDashboard() {
                       <option value="Perlu Evaluasi">Perlu Evaluasi</option>
                     </select>
 
-                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                    <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                       {evaluasiFiltered.length} Data
                     </span>
                   </div>
@@ -728,7 +734,7 @@ export default function PenyuluhDashboard() {
                 <div className="overflow-x-auto">
                   {evaluasiAktual.length > 0 ? (
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 text-slate-500">
+                      <thead className="bg-[#0b1220] text-slate-400">
                         <tr>
                           <th className="text-left font-semibold px-6 py-4">
                             No
@@ -758,48 +764,48 @@ export default function PenyuluhDashboard() {
                         {evaluasiFiltered.map((item, index) => (
                           <tr
                             key={`${item.tahun}-${item.bulan}-${index}`}
-                            className="border-t border-slate-100 hover:bg-slate-50 transition"
+                            className="border-t border-slate-800 hover:bg-slate-800/60 transition"
                           >
-                            <td className="px-6 py-4 text-slate-500">
+                            <td className="px-6 py-4 text-slate-400">
                               {index + 1}
                             </td>
 
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center">
                                   <CalendarDays size={18} />
                                 </div>
 
                                 <div>
-                                  <p className="font-semibold text-slate-800">
+                                  <p className="font-semibold text-white">
                                     {namaBulan(item.bulan)} {item.tahun}
                                   </p>
-                                  <p className="text-xs text-slate-400">
+                                  <p className="text-xs text-slate-500">
                                     Periode evaluasi
                                   </p>
                                 </div>
                               </div>
                             </td>
 
-                            <td className="px-6 py-4 text-slate-700 font-semibold">
+                            <td className="px-6 py-4 text-slate-300 font-semibold">
                               {formatAngka(item.aktual)} Ton
                             </td>
 
-                            <td className="px-6 py-4 text-emerald-700 font-semibold">
+                            <td className="px-6 py-4 text-emerald-300 font-semibold">
                               {formatAngka(item.prediksi)} Ton
                             </td>
 
                             <td
                               className={`px-6 py-4 font-semibold ${
                                 Number(item.selisih) < 0
-                                  ? "text-red-600"
-                                  : "text-emerald-700"
+                                  ? "text-red-400"
+                                  : "text-emerald-400"
                               }`}
                             >
                               {formatAngka(item.selisih)} Ton
                             </td>
 
-                            <td className="px-6 py-4 text-slate-700 font-semibold">
+                            <td className="px-6 py-4 text-yellow-300 font-semibold">
                               {formatAngka(item.ape)}%
                             </td>
 
@@ -818,7 +824,7 @@ export default function PenyuluhDashboard() {
                     </table>
                   ) : (
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 text-slate-500">
+                      <thead className="bg-[#0b1220] text-slate-400">
                         <tr>
                           <th className="text-left font-semibold px-6 py-4">
                             Periode
@@ -837,17 +843,17 @@ export default function PenyuluhDashboard() {
                           prediksiTabel.map((item, index) => (
                             <tr
                               key={`${item.tahun}-${item.bulan}-${index}`}
-                              className="border-t border-slate-100 hover:bg-slate-50"
+                              className="border-t border-slate-800 hover:bg-slate-800/60"
                             >
-                              <td className="px-6 py-4 font-semibold text-slate-800">
+                              <td className="px-6 py-4 font-semibold text-white">
                                 {namaBulan(item.bulan)} {item.tahun}
                               </td>
 
-                              <td className="px-6 py-4 text-emerald-700 font-semibold">
+                              <td className="px-6 py-4 text-emerald-300 font-semibold">
                                 {formatAngka(item.prediksi)} Ton
                               </td>
 
-                              <td className="px-6 py-4 text-slate-500">
+                              <td className="px-6 py-4 text-slate-400">
                                 Belum ada data aktual produksi bulanan untuk
                                 evaluasi periode ini.
                               </td>
@@ -869,20 +875,21 @@ export default function PenyuluhDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+              {/* CATATAN PENYULUH */}
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-6">
                 <div className="flex items-start gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center shrink-0">
                     <FileText size={23} />
                   </div>
 
                   <div>
-                    <h2 className="text-lg font-bold text-slate-800">
+                    <h2 className="text-lg font-bold text-white">
                       Catatan Tambahan Penyuluh
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-400 mt-1">
                       Catatan akan disimpan ke database sesuai periode prediksi
                       berikutnya, yaitu{" "}
-                      <span className="font-semibold text-emerald-700">
+                      <span className="font-semibold text-cyan-300">
                         {prediksiBulanDepan
                           ? `${namaBulan(prediksiBulanDepan.bulan)} ${prediksiBulanDepan.tahun}`
                           : "-"}
@@ -895,39 +902,40 @@ export default function PenyuluhDashboard() {
                 <textarea
                   value={catatanPenyuluh}
                   onChange={(e) => setCatatanPenyuluh(e.target.value)}
-                  className="w-full border border-slate-200 rounded-2xl p-4 h-32 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                  className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-4 h-32 text-sm text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500"
                   placeholder="Contoh: Periode dengan prediksi rendah perlu pendampingan terkait pengairan, hama, penyakit tanaman, dan kesiapan petani menghadapi kondisi cuaca."
                 />
 
                 <button
                   onClick={handleSimpanCatatan}
                   disabled={savingCatatan}
-                  className="mt-4 bg-emerald-600 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-semibold flex items-center gap-2 transition disabled:opacity-60"
+                  className="mt-4 bg-cyan-600 text-white px-5 py-2.5 rounded-xl hover:bg-cyan-700 text-sm font-semibold flex items-center gap-2 transition disabled:opacity-60"
                 >
                   <Save size={17} />
                   {savingCatatan ? "Menyimpan..." : "Simpan Catatan"}
                 </button>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              {/* RIWAYAT CATATAN */}
+              <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+                <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
                   <div>
-                    <h2 className="font-bold text-slate-800">
+                    <h2 className="font-bold text-white">
                       Riwayat Catatan Penyuluh
                     </h2>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-400">
                       Catatan yang sudah tersimpan di database.
                     </p>
                   </div>
 
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                     {daftarCatatan.length} Catatan
                   </span>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
+                    <thead className="bg-[#0b1220] text-slate-400">
                       <tr>
                         <th className="text-left font-semibold px-6 py-4">
                           No
@@ -952,25 +960,25 @@ export default function PenyuluhDashboard() {
                         riwayatCatatanTampil.map((item, index) => (
                           <tr
                             key={item.id || index}
-                            className="border-t border-slate-100 hover:bg-slate-50"
+                            className="border-t border-slate-800 hover:bg-slate-800/60"
                           >
-                            <td className="px-6 py-4 text-slate-500">
+                            <td className="px-6 py-4 text-slate-400">
                               {index + 1}
                             </td>
 
-                            <td className="px-6 py-4 font-semibold text-slate-800">
+                            <td className="px-6 py-4 font-semibold text-white">
                               {namaBulan(item.bulan)} {item.tahun}
                             </td>
 
-                            <td className="px-6 py-4 text-slate-600">
+                            <td className="px-6 py-4 text-slate-300">
                               {item.nama_penyuluh || "Penyuluh"}
                             </td>
 
-                            <td className="px-6 py-4 text-slate-600 max-w-xl leading-relaxed">
+                            <td className="px-6 py-4 text-slate-300 max-w-xl leading-relaxed">
                               {item.catatan || "-"}
                             </td>
 
-                            <td className="px-6 py-4 text-slate-500">
+                            <td className="px-6 py-4 text-slate-400">
                               {formatTanggalJam(item.created_at)}
                             </td>
                           </tr>
@@ -990,14 +998,15 @@ export default function PenyuluhDashboard() {
                 </div>
               </div>
 
-              <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex gap-4">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center shrink-0">
+              {/* CATATAN HALAMAN */}
+              <div className="bg-emerald-500/10 border border-emerald-500/30 p-5 rounded-2xl flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center justify-center shrink-0">
                   <Info size={22} />
                 </div>
 
                 <div>
-                  <h2 className="font-bold text-emerald-800 mb-1">Catatan</h2>
-                  <p className="text-sm text-emerald-700 leading-relaxed">
+                  <h2 className="font-bold text-emerald-300 mb-1">Catatan</h2>
+                  <p className="text-sm text-emerald-100/80 leading-relaxed">
                     Dashboard penyuluh digunakan untuk memantau hasil prediksi
                     produksi padi Kabupaten Sukoharjo, mengevaluasi kesesuaian
                     prediksi dengan data aktual bulanan, serta memberikan arahan
@@ -1017,19 +1026,21 @@ export default function PenyuluhDashboard() {
 
 function StatCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    blue: "bg-blue-100 text-blue-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    red: "bg-red-100 text-red-700",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border border-blue-500/20",
+    yellow:
+      "bg-yellow-500/10 text-yellow-300 border border-yellow-500/20",
+    red: "bg-red-500/10 text-red-300 border border-red-500/20",
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-5 hover:-translate-y-1 transition">
       <div className="flex justify-between items-start gap-4">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-800 mt-2">{value}</h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h3 className="text-2xl font-bold text-white mt-2">{value}</h3>
+          <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
         </div>
 
         <div
@@ -1046,14 +1057,15 @@ function StatCard({ title, value, subtitle, icon: Icon, tone }) {
 
 function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    blue: "bg-blue-50 text-blue-700 border-blue-100",
-    red: "bg-red-50 text-red-700 border-red-100",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border-blue-500/20",
+    red: "bg-red-500/10 text-red-300 border-red-500/20",
   };
 
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`rounded-2xl border p-5 shadow-lg shadow-black/10 ${
         toneClass[tone] || toneClass.emerald
       }`}
     >
@@ -1064,7 +1076,7 @@ function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
           <p className="text-xs mt-2 opacity-80 leading-relaxed">{subtitle}</p>
         </div>
 
-        <div className="w-10 h-10 rounded-xl bg-white/70 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-black/20 flex items-center justify-center shrink-0">
           <Icon size={20} />
         </div>
       </div>
@@ -1074,13 +1086,13 @@ function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
 
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-      <div className="flex items-center gap-2 text-slate-500 text-sm">
-        <Icon size={16} className="text-emerald-600" />
+    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="flex items-center gap-2 text-slate-400 text-sm">
+        <Icon size={16} className="text-cyan-300" />
         {label}
       </div>
 
-      <span className="text-sm font-bold text-slate-800">{value}</span>
+      <span className="text-sm font-bold text-white">{value}</span>
     </div>
   );
 }

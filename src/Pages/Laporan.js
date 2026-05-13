@@ -1,883 +1,1195 @@
+import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import {
-  AlertTriangle,
-  CheckCircle,
-  RefreshCw,
-  Download,
-  FileSpreadsheet,
-  Target,
-  CalendarDays,
-  Leaf,
-  Info,
-  Database,
-  Gauge,
-  TrendingUp,
-  Percent,
-} from "lucide-react";
+
+function warnaStatus(status) {
+  if (status === "Normal") return "#22c55e";
+  if (status === "Cukup") return "#facc15";
+  if (status === "Perlu Evaluasi") return "#ef4444";
+  return "#94a3b8";
+}
+
+function warnaRisiko(risiko) {
+  if (risiko === "Rendah") return "#22c55e";
+  if (risiko === "Sedang") return "#facc15";
+  if (risiko === "Tinggi") return "#ef4444";
+  return "#94a3b8";
+}
+
+function warnaTextStatus(status) {
+  if (status === "Normal") return "text-green-400";
+  if (status === "Cukup") return "text-yellow-400";
+  if (status === "Perlu Evaluasi") return "text-red-400";
+  return "text-slate-400";
+}
+
+function warnaTextRisiko(risiko) {
+  if (risiko === "Rendah") return "text-green-400";
+  if (risiko === "Sedang") return "text-yellow-400";
+  if (risiko === "Tinggi") return "text-red-400";
+  return "text-slate-400";
+}
+
+function bulanKeAngka(bulan) {
+  const daftar = {
+    januari: 1,
+    jan: 1,
+    februari: 2,
+    feb: 2,
+    maret: 3,
+    mar: 3,
+    april: 4,
+    apr: 4,
+    mei: 5,
+    may: 5,
+    juni: 6,
+    jun: 6,
+    juli: 7,
+    jul: 7,
+    agustus: 8,
+    agu: 8,
+    aug: 8,
+    september: 9,
+    sep: 9,
+    oktober: 10,
+    okt: 10,
+    oct: 10,
+    november: 11,
+    nov: 11,
+    desember: 12,
+    des: 12,
+    dec: 12,
+  };
+
+  if (!bulan) return null;
+
+  if (!isNaN(Number(bulan))) {
+    const angka = Number(bulan);
+    return angka >= 1 && angka <= 12 ? angka : null;
+  }
+
+  return daftar[String(bulan).toLowerCase()] || null;
+}
+
+function formatPeriode(periode) {
+  if (!periode || periode === "-") return "-";
+
+  const bulanIndonesia = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  const teks = String(periode);
+
+  if (teks.includes("-")) {
+    const bagian = teks.split("-");
+    const tahun = bagian[0];
+    const bulan = Number(bagian[1]);
+
+    if (tahun && bulan >= 1 && bulan <= 12) {
+      return `${bulanIndonesia[bulan - 1]} ${tahun}`;
+    }
+  }
+
+  return teks;
+}
+
+function ambilPeriode(item) {
+  if (!item) return "-";
+
+  if (item.periode) return item.periode;
+  if (item.tanggal) return item.tanggal;
+  if (item.tanggal_panen) return item.tanggal_panen;
+  if (item.periode_evaluasi) return item.periode_evaluasi;
+
+  if (item.tahun && item.bulan) {
+    const bulan = bulanKeAngka(item.bulan);
+    if (bulan) {
+      return `${item.tahun}-${String(bulan).padStart(2, "0")}-01`;
+    }
+  }
+
+  return "-";
+}
+
+function ambilNilai(item, daftarKey, defaultValue = "-") {
+  if (!item) return defaultValue;
+
+  for (const key of daftarKey) {
+    if (item[key] !== undefined && item[key] !== null && item[key] !== "") {
+      return item[key];
+    }
+  }
+
+  return defaultValue;
+}
+
+function formatTon(nilai) {
+  if (nilai === null || nilai === undefined || nilai === "") return "-";
+
+  if (typeof nilai === "string") {
+    if (nilai.toLowerCase().includes("ton")) return nilai;
+    if (nilai === "-") return "-";
+  }
+
+  const angka = Number(String(nilai).replace(/[^\d.-]/g, ""));
+
+  if (!isNaN(angka)) {
+    return `${angka.toLocaleString("id-ID")} ton`;
+  }
+
+  return String(nilai);
+}
+
+function formatPersen(nilai) {
+  if (nilai === null || nilai === undefined || nilai === "") return "-";
+
+  if (typeof nilai === "string") {
+    if (nilai.includes("%")) return nilai;
+    if (nilai === "-") return "-";
+  }
+
+  const angka = Number(String(nilai).replace(/[^\d.-]/g, ""));
+
+  if (!isNaN(angka)) {
+    return `${angka.toLocaleString("id-ID", {
+      maximumFractionDigits: 2,
+    })}%`;
+  }
+
+  return String(nilai);
+}
+
+function safeArray(data) {
+  return Array.isArray(data) ? data : [];
+}
+
+async function fetchJson(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Fetch error:", url, error);
+    return null;
+  }
+}
+
+function namaFileAman(value) {
+  return String(value || "periode")
+    .replaceAll("/", "-")
+    .replaceAll("\\", "-")
+    .replaceAll(":", "-")
+    .replaceAll(" ", "-");
+}
 
 export default function Laporan() {
-  const [ringkasanPrediksi, setRingkasanPrediksi] = useState(null);
-  const [prediksiMendatang, setPrediksiMendatang] = useState([]);
-  const [ringkasanEvaluasi, setRingkasanEvaluasi] = useState(null);
-  const [evaluasiTes, setEvaluasiTes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_TES = "http://127.0.0.1:8000/api/tes/prediksi";
-  const API_EVALUASI = "http://127.0.0.1:8000/api/tes/evaluasi-aktual";
+  const [dataTes, setDataTes] = useState({
+    level_data: "Kabupaten Sukoharjo",
+    periode: "-",
+    prediksi: "-",
+    aktual: "-",
+    mape: "-",
+    status: "-",
+    analisis: "-",
+  });
 
-  useEffect(() => {
-    getLaporanTes();
-  }, []);
+  const [summary, setSummary] = useState({
+    total_wilayah: 0,
+    normal: 0,
+    cukup: 0,
+    perlu_evaluasi: 0,
+    risiko_rendah: 0,
+    risiko_sedang: 0,
+    risiko_tinggi: 0,
+  });
 
-  const getLaporanTes = async () => {
+  const [kesimpulanUmum, setKesimpulanUmum] = useState("");
+  const [dataWilayah, setDataWilayah] = useState([]);
+  const [dataPrediksi, setDataPrediksi] = useState([]);
+
+  const [keyword, setKeyword] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Semua");
+  const [filterRisiko, setFilterRisiko] = useState("Semua");
+
+  const loadData = async () => {
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
-      setError("");
-
-      const [tesRes, evaluasiRes] = await Promise.all([
-        axios.get(API_TES),
-        axios.get(API_EVALUASI),
+      const [gisRes, tesRes, laporanRes] = await Promise.all([
+        fetchJson("http://localhost:8000/api/gis/monitoring"),
+        fetchJson("http://localhost:8000/api/tes/prediksi"),
+        fetchJson("http://localhost:8000/api/laporan"),
       ]);
 
-      const tesPayload = tesRes.data?.data || {};
-      const evaluasiPayload = evaluasiRes.data?.data || {};
+      if (!gisRes && !tesRes && !laporanRes) {
+        throw new Error("Semua endpoint laporan gagal diakses.");
+      }
 
-      setRingkasanPrediksi(tesPayload.ringkasan || null);
-      setPrediksiMendatang(
-        Array.isArray(tesPayload.prediksiMendatang)
-          ? tesPayload.prediksiMendatang
-          : []
+      const dataTesBaru =
+        gisRes?.data_tes ||
+        laporanRes?.data_tes ||
+        laporanRes?.summary?.data_tes ||
+        {
+          level_data: "Kabupaten Sukoharjo",
+          periode: "-",
+          prediksi: "-",
+          aktual: "-",
+          mape: "-",
+          status: "-",
+          analisis: "-",
+        };
+
+      setDataTes({
+        level_data: dataTesBaru.level_data || "Kabupaten Sukoharjo",
+        periode: dataTesBaru.periode || "-",
+        prediksi: dataTesBaru.prediksi || "-",
+        aktual: dataTesBaru.aktual || "-",
+        mape: dataTesBaru.mape || "-",
+        status: dataTesBaru.status || "-",
+        analisis: dataTesBaru.analisis || "-",
+      });
+
+      setSummary(
+        gisRes?.summary ||
+          laporanRes?.summary || {
+            total_wilayah: 0,
+            normal: 0,
+            cukup: 0,
+            perlu_evaluasi: 0,
+            risiko_rendah: 0,
+            risiko_sedang: 0,
+            risiko_tinggi: 0,
+          }
       );
-      setRingkasanEvaluasi(evaluasiPayload.ringkasan || null);
-      setEvaluasiTes(
-        Array.isArray(evaluasiPayload.evaluasi)
-          ? evaluasiPayload.evaluasi
-          : []
+
+      setKesimpulanUmum(
+        gisRes?.kesimpulan_umum ||
+          laporanRes?.kesimpulan_umum ||
+          "Laporan menampilkan hasil prediksi TES, evaluasi MAPE, risiko cuaca wilayah, dan rekomendasi monitoring."
       );
+
+      setDataWilayah(safeArray(gisRes?.data));
+
+      const prediksiList =
+        tesRes?.prediksi_mendatang ||
+        tesRes?.data?.prediksi_mendatang ||
+        tesRes?.prediksi ||
+        laporanRes?.prediksi_mendatang ||
+        laporanRes?.data?.prediksi_mendatang ||
+        laporanRes?.data?.prediksi ||
+        laporanRes?.prediksi ||
+        [];
+
+      const evaluasiList =
+        tesRes?.evaluasi ||
+        tesRes?.data?.evaluasi ||
+        laporanRes?.evaluasi ||
+        laporanRes?.data?.evaluasi ||
+        [];
+
+      const mapEvaluasi = {};
+
+      safeArray(evaluasiList).forEach((item) => {
+        const periode = ambilPeriode(item);
+        mapEvaluasi[periode] = item;
+      });
+
+      let hasilPrediksi = safeArray(prediksiList).map((item) => {
+        const periode = ambilPeriode(item);
+        const evaluasi = mapEvaluasi[periode] || {};
+
+        return {
+          periode,
+          prediksi: formatTon(
+            ambilNilai(item, [
+              "prediksi",
+              "prediksi_tes",
+              "hasil_prediksi",
+              "produksi_prediksi",
+              "nilai_prediksi",
+            ])
+          ),
+          aktual: formatTon(
+            ambilNilai(evaluasi, [
+              "aktual",
+              "produksi_aktual",
+              "hasil_aktual",
+              "nilai_aktual",
+            ])
+          ),
+          mape: formatPersen(
+            ambilNilai(evaluasi, ["mape", "nilai_mape", "error"])
+          ),
+          status: ambilNilai(evaluasi, ["status", "status_model"], "Belum Ada"),
+          kategori: ambilNilai(item, ["kategori", "status_prediksi"], "-"),
+        };
+      });
+
+      if (hasilPrediksi.length === 0 && safeArray(evaluasiList).length > 0) {
+        hasilPrediksi = safeArray(evaluasiList).map((item) => ({
+          periode: ambilPeriode(item),
+          prediksi: formatTon(
+            ambilNilai(item, [
+              "prediksi",
+              "prediksi_tes",
+              "hasil_prediksi",
+              "produksi_prediksi",
+            ])
+          ),
+          aktual: formatTon(
+            ambilNilai(item, [
+              "aktual",
+              "produksi_aktual",
+              "hasil_aktual",
+              "nilai_aktual",
+            ])
+          ),
+          mape: formatPersen(ambilNilai(item, ["mape", "nilai_mape", "error"])),
+          status: ambilNilai(item, ["status", "status_model"], "Belum Ada"),
+          kategori: "-",
+        }));
+      }
+
+      if (hasilPrediksi.length === 0 && dataTesBaru.prediksi) {
+        hasilPrediksi = [
+          {
+            periode: dataTesBaru.periode || "-",
+            prediksi: dataTesBaru.prediksi || "-",
+            aktual: dataTesBaru.aktual || "-",
+            mape: dataTesBaru.mape || "-",
+            status: dataTesBaru.status || "-",
+            kategori: "-",
+          },
+        ];
+      }
+
+      setDataPrediksi(hasilPrediksi);
+      setLoading(false);
     } catch (err) {
-      console.error(err);
-      setError(
-        err.response?.data?.message ||
-          "Gagal mengambil data laporan TES. Pastikan backend Laravel sudah berjalan."
-      );
-    } finally {
+      console.error("Error laporan:", err);
+      setError("Data laporan gagal dimuat. Pastikan backend Laravel aktif.");
       setLoading(false);
     }
   };
 
-  const formatAngka = (angka) => {
-    if (angka === null || angka === undefined || angka === "") return "-";
-    const nilai = Number(angka);
-    if (Number.isNaN(nilai)) return "-";
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    return nilai.toLocaleString("id-ID", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+  const periodeTampil = formatPeriode(dataTes.periode);
+
+  const dataWilayahTampil = useMemo(() => {
+    return dataWilayah.filter((item) => {
+      const nama = item.nama || "";
+
+      const cocokKeyword = nama
+        .toLowerCase()
+        .includes(keyword.toLowerCase());
+
+      const cocokStatus =
+        filterStatus === "Semua" || item.status === filterStatus;
+
+      const cocokRisiko =
+        filterRisiko === "Semua" || item.risiko === filterRisiko;
+
+      return cocokKeyword && cocokStatus && cocokRisiko;
     });
+  }, [dataWilayah, keyword, filterStatus, filterRisiko]);
+
+  const buildLaporanRows = () => {
+    return dataWilayahTampil.map((item, index) => ({
+      No: index + 1,
+      Kecamatan: item.nama || "-",
+      Tanaman: "Padi",
+      "Periode Prediksi": periodeTampil,
+      "Prediksi TES": item.prediksi || dataTes.prediksi || "-",
+      Aktual: item.aktual || dataTes.aktual || "-",
+      MAPE: item.mape || dataTes.mape || "-",
+      "Status Model": item.status || dataTes.status || "-",
+      Suhu: item.suhu || "-",
+      Kelembaban: item.kelembaban || "-",
+      "Kondisi Cuaca": item.kondisi || "-",
+      Risiko: item.risiko || "-",
+      Rekomendasi: item.kesimpulan_monitoring || item.rekomendasi || "-",
+    }));
   };
 
-  const namaBulan = (bulan) => {
-    const bulanList = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "Mei",
-      "Jun",
-      "Jul",
-      "Agu",
-      "Sep",
-      "Okt",
-      "Nov",
-      "Des",
-    ];
-
-    return bulanList[Number(bulan) - 1] || "-";
-  };
-
-  const rataRataPrediksi = useMemo(() => {
-    if (prediksiMendatang.length === 0) return 0;
-
-    const total = prediksiMendatang.reduce(
-      (sum, item) => sum + Number(item.prediksi || 0),
-      0
-    );
-
-    return total / prediksiMendatang.length;
-  }, [prediksiMendatang]);
-
-  const getKategoriPrediksi = (nilai) => {
-    const prediksi = Number(nilai || 0);
-    const rata = Number(rataRataPrediksi || 0);
-
-    if (!rata) return "Belum Dikategorikan";
-    if (prediksi >= rata * 1.15) return "Tinggi";
-    if (prediksi <= rata * 0.85) return "Rendah";
-    return "Sedang";
-  };
-
-  const getKategoriBadge = (kategori) => {
-    if (kategori === "Tinggi") {
-      return "bg-emerald-50 text-emerald-700 border-emerald-100";
-    }
-
-    if (kategori === "Sedang") {
-      return "bg-yellow-50 text-yellow-700 border-yellow-100";
-    }
-
-    if (kategori === "Rendah") {
-      return "bg-red-50 text-red-700 border-red-100";
-    }
-
-    return "bg-slate-50 text-slate-700 border-slate-100";
-  };
-
-  const getStatusModel = () => {
-    const status = ringkasanEvaluasi?.statusModel;
-    const mape = Number(ringkasanEvaluasi?.mape || 0);
-
-    if (status === "Akurat" || mape <= 10) {
-      return {
-        label: "Akurat",
-        tone: "emerald",
-      };
-    }
-
-    if (status === "Cukup" || mape <= 20) {
-      return {
-        label: "Cukup",
-        tone: "yellow",
-      };
-    }
-
-    if (status === "Belum Dievaluasi") {
-      return {
-        label: "Belum Dievaluasi",
-        tone: "blue",
-      };
-    }
-
-    return {
-      label: "Perlu Evaluasi",
-      tone: "red",
-    };
-  };
-
-  const statusModel = getStatusModel();
-
-  const periodeEvaluasiSet = useMemo(() => {
-    return new Set(
-      evaluasiTes.map((item) => `${Number(item.tahun)}-${Number(item.bulan)}`)
-    );
-  }, [evaluasiTes]);
-
-  const prediksiBelumDievaluasi = useMemo(() => {
-    return prediksiMendatang.filter(
-      (item) =>
-        !periodeEvaluasiSet.has(`${Number(item.tahun)}-${Number(item.bulan)}`)
-    );
-  }, [prediksiMendatang, periodeEvaluasiSet]);
-
-  const prediksiPeriodeBerikutnya =
-    prediksiBelumDievaluasi[0] || prediksiMendatang[0] || null;
-
-  const prediksiTertinggi = useMemo(() => {
-    if (prediksiMendatang.length === 0) return null;
-
-    return [...prediksiMendatang].sort(
-      (a, b) => Number(b.prediksi || 0) - Number(a.prediksi || 0)
-    )[0];
-  }, [prediksiMendatang]);
-
-  const prediksiTerendah = useMemo(() => {
-    if (prediksiMendatang.length === 0) return null;
-
-    return [...prediksiMendatang].sort(
-      (a, b) => Number(a.prediksi || 0) - Number(b.prediksi || 0)
-    )[0];
-  }, [prediksiMendatang]);
-
-  const kesimpulan =
-    ringkasanEvaluasi?.jumlahDataEvaluasi > 0
-      ? `Model TES menggunakan ${
-          ringkasanPrediksi?.jumlahDataHistoris || 0
-        } data historis produksi bulanan. Berdasarkan ${
-          ringkasanEvaluasi?.jumlahDataEvaluasi || 0
-        } data aktual yang dievaluasi, diperoleh MAPE ${formatAngka(
-          ringkasanEvaluasi?.mape
-        )}% dengan estimasi akurasi ${formatAngka(
-          ringkasanEvaluasi?.estimasiAkurasi
-        )}%. Status model berada pada kategori ${statusModel.label}.`
-      : `Model TES menggunakan ${
-          ringkasanPrediksi?.jumlahDataHistoris || 0
-        } data historis produksi bulanan. Evaluasi aktual belum tersedia, sehingga MAPE dan akurasi belum dapat disimpulkan.`;
-
-  const exportPDF = () => {
-    const doc = new jsPDF("landscape");
-
-    doc.setFontSize(14);
-    doc.text("Laporan Admin GeoPanen - Prediksi TES", 14, 15);
-
-    doc.setFontSize(10);
-    doc.text(
-      `Data Historis: ${
-        ringkasanPrediksi?.jumlahDataHistoris || 0
-      } | Prediksi: ${prediksiMendatang.length} periode | Evaluasi: ${
-        ringkasanEvaluasi?.jumlahDataEvaluasi || 0
-      } periode`,
-      14,
-      25
-    );
-
-    doc.text(
-      `MAPE: ${formatAngka(
-        ringkasanEvaluasi?.mape
-      )}% | Akurasi: ${formatAngka(
-        ringkasanEvaluasi?.estimasiAkurasi
-      )}% | Status: ${statusModel.label}`,
-      14,
-      32
-    );
-
-    autoTable(doc, {
-      head: [["Komponen", "Nilai"]],
-      body: [
-        ["Data Historis TES", `${ringkasanPrediksi?.jumlahDataHistoris || 0} data`],
-        ["Prediksi Mendatang", `${prediksiMendatang.length} periode`],
-        ["Evaluasi Aktual", `${ringkasanEvaluasi?.jumlahDataEvaluasi || 0} periode`],
-        ["MAPE", `${formatAngka(ringkasanEvaluasi?.mape)}%`],
-        ["Estimasi Akurasi", `${formatAngka(ringkasanEvaluasi?.estimasiAkurasi)}%`],
-        ["Status Model", statusModel.label],
-      ],
-      startY: 42,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [5, 150, 105] },
-    });
-
-    const prediksiRows = prediksiMendatang.map((item, index) => [
-      index + 1,
-      `${namaBulan(item.bulan)} ${item.tahun}`,
-      `${formatAngka(item.prediksi)} ton`,
-      getKategoriPrediksi(item.prediksi),
-      periodeEvaluasiSet.has(`${Number(item.tahun)}-${Number(item.bulan)}`)
-        ? "Sudah Dievaluasi"
-        : "Belum Dievaluasi",
-    ]);
-
-    autoTable(doc, {
-      head: [["No", "Periode", "Prediksi TES", "Kategori", "Status Evaluasi"]],
-      body: prediksiRows,
-      startY: doc.lastAutoTable.finalY + 8,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [5, 150, 105] },
-    });
-
-    doc.save("laporan_admin_geopanen_tes.pdf");
-  };
-
-  const exportExcel = () => {
+  const handleExportExcel = () => {
     const workbook = XLSX.utils.book_new();
 
-    const ringkasanSheet = [
-      { Komponen: "Data Historis TES", Nilai: ringkasanPrediksi?.jumlahDataHistoris || 0 },
-      { Komponen: "Prediksi Mendatang", Nilai: prediksiMendatang.length },
-      { Komponen: "Jumlah Evaluasi Aktual", Nilai: ringkasanEvaluasi?.jumlahDataEvaluasi || 0 },
-      { Komponen: "MAPE", Nilai: `${formatAngka(ringkasanEvaluasi?.mape)}%` },
-      { Komponen: "Estimasi Akurasi", Nilai: `${formatAngka(ringkasanEvaluasi?.estimasiAkurasi)}%` },
-      { Komponen: "Status Model", Nilai: statusModel.label },
+    const ringkasan = [
+      ["Laporan Prediksi dan Monitoring Panen Padi"],
+      ["Kabupaten", "Sukoharjo"],
+      ["Periode Prediksi", periodeTampil],
+      ["Prediksi TES", dataTes.prediksi],
+      ["Aktual Produksi", dataTes.aktual],
+      ["MAPE", dataTes.mape],
+      ["Status Model", dataTes.status],
+      ["Total Wilayah Dipantau", summary.total_wilayah],
+      ["Risiko Rendah", summary.risiko_rendah],
+      ["Risiko Sedang", summary.risiko_sedang],
+      ["Risiko Tinggi", summary.risiko_tinggi],
+      [],
+      ["Kesimpulan"],
+      [kesimpulanUmum],
+      [],
+      ["Catatan"],
+      [
+        "Prediksi dihitung menggunakan metode Triple Exponential Smoothing berdasarkan data historis produksi bulanan.",
+      ],
+      [
+        "MAPE digunakan untuk membandingkan hasil prediksi dengan data aktual.",
+      ],
+      [
+        "Cuaca digunakan untuk menentukan risiko wilayah dan rekomendasi, bukan sebagai input langsung rumus TES.",
+      ],
     ];
 
-    const prediksiSheet = prediksiMendatang.map((item, index) => ({
-      No: index + 1,
-      Periode: `${namaBulan(item.bulan)} ${item.tahun}`,
-      Tahun: item.tahun,
-      Bulan: item.bulan,
-      Prediksi: Number(item.prediksi || 0),
-      Kategori: getKategoriPrediksi(item.prediksi),
-      "Status Evaluasi": periodeEvaluasiSet.has(
-        `${Number(item.tahun)}-${Number(item.bulan)}`
-      )
-        ? "Sudah Dievaluasi"
-        : "Belum Dievaluasi",
-    }));
+    const sheetRingkasan = XLSX.utils.aoa_to_sheet(ringkasan);
+    sheetRingkasan["!cols"] = [{ wch: 28 }, { wch: 90 }];
+    XLSX.utils.book_append_sheet(workbook, sheetRingkasan, "Ringkasan");
 
-    const evaluasiSheet = evaluasiTes.map((item, index) => ({
-      No: index + 1,
-      Periode: `${namaBulan(item.bulan)} ${item.tahun}`,
-      Tahun: item.tahun,
-      Bulan: item.bulan,
-      Aktual: Number(item.aktual || 0),
-      Prediksi: Number(item.prediksi || 0),
-      Selisih: Number(item.selisih || 0),
-      Deviasi: `${formatAngka(item.deviasi)}%`,
-      APE: `${formatAngka(item.ape)}%`,
-      Status: item.status || "-",
-    }));
+    const wilayahRows = buildLaporanRows();
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(ringkasanSheet),
-      "Ringkasan"
+    const sheetWilayah = XLSX.utils.json_to_sheet(
+      wilayahRows.length > 0
+        ? wilayahRows
+        : [
+            {
+              No: "-",
+              Kecamatan: "-",
+              Tanaman: "-",
+              "Periode Prediksi": "-",
+              "Prediksi TES": "-",
+              Aktual: "-",
+              MAPE: "-",
+              "Status Model": "-",
+              Suhu: "-",
+              Kelembaban: "-",
+              "Kondisi Cuaca": "-",
+              Risiko: "-",
+              Rekomendasi: "-",
+            },
+          ]
     );
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(prediksiSheet),
-      "Prediksi TES"
+    sheetWilayah["!cols"] = [
+      { wch: 6 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 16 },
+      { wch: 12 },
+      { wch: 16 },
+      { wch: 12 },
+      { wch: 14 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 80 },
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, sheetWilayah, "Monitoring Wilayah");
+
+    const sheetPrediksi = XLSX.utils.json_to_sheet(
+      dataPrediksi.length > 0
+        ? dataPrediksi.map((item, index) => ({
+            No: index + 1,
+            Periode: formatPeriode(item.periode),
+            "Prediksi TES": item.prediksi,
+            Aktual: item.aktual,
+            MAPE: item.mape,
+            Status: item.status,
+            Kategori: item.kategori,
+          }))
+        : [
+            {
+              No: "-",
+              Periode: "-",
+              "Prediksi TES": "-",
+              Aktual: "-",
+              MAPE: "-",
+              Status: "-",
+              Kategori: "-",
+            },
+          ]
     );
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(evaluasiSheet),
-      "Evaluasi Aktual TES"
-    );
+    sheetPrediksi["!cols"] = [
+      { wch: 6 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 18 },
+      { wch: 18 },
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, sheetPrediksi, "Prediksi Bulanan");
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",
       type: "array",
     });
 
-    const file = new Blob([excelBuffer], {
-      type: "application/octet-stream",
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
     });
 
-    saveAs(file, "laporan_admin_geopanen_tes.xlsx");
+    saveAs(
+      blob,
+      `laporan-geopanen-${namaFileAman(dataTes.periode)}.xlsx`
+    );
   };
 
+  const handleExportPdf = () => {
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Laporan Prediksi dan Monitoring Panen Padi", 14, 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Kabupaten Sukoharjo", 14, 22);
+    doc.text(`Periode Prediksi: ${periodeTampil}`, 14, 28);
+
+    doc.setFontSize(8);
+    doc.text(
+      `Dicetak: ${new Date().toLocaleString("id-ID")}`,
+      pageWidth - 70,
+      15
+    );
+
+    autoTable(doc, {
+      startY: 35,
+      theme: "grid",
+      head: [["Ringkasan", "Nilai"]],
+      body: [
+        ["Prediksi TES", dataTes.prediksi],
+        ["Aktual Produksi", dataTes.aktual],
+        ["MAPE", dataTes.mape],
+        ["Status Model", dataTes.status],
+        ["Total Wilayah Dipantau", summary.total_wilayah],
+        ["Risiko Rendah", summary.risiko_rendah],
+        ["Risiko Sedang", summary.risiko_sedang],
+        ["Risiko Tinggi", summary.risiko_tinggi],
+      ],
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [16, 185, 129],
+        textColor: 255,
+      },
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    });
+
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 8,
+      theme: "grid",
+      head: [
+        [
+          "No",
+          "Kecamatan",
+          "Prediksi",
+          "Aktual",
+          "MAPE",
+          "Status",
+          "Suhu",
+          "Kelembaban",
+          "Cuaca",
+          "Risiko",
+          "Rekomendasi",
+        ],
+      ],
+      body: buildLaporanRows().map((item) => [
+        item.No,
+        item.Kecamatan,
+        item["Prediksi TES"],
+        item.Aktual,
+        item.MAPE,
+        item["Status Model"],
+        item.Suhu,
+        item.Kelembaban,
+        item["Kondisi Cuaca"],
+        item.Risiko,
+        item.Rekomendasi,
+      ]),
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+        overflow: "linebreak",
+      },
+      headStyles: {
+        fillColor: [15, 118, 110],
+        textColor: 255,
+      },
+      columnStyles: {
+        0: { cellWidth: 9 },
+        1: { cellWidth: 23 },
+        2: { cellWidth: 23 },
+        3: { cellWidth: 22 },
+        4: { cellWidth: 15 },
+        5: { cellWidth: 20 },
+        6: { cellWidth: 14 },
+        7: { cellWidth: 21 },
+        8: { cellWidth: 23 },
+        9: { cellWidth: 17 },
+        10: { cellWidth: 88 },
+      },
+      margin: {
+        left: 10,
+        right: 10,
+      },
+    });
+
+    const akhirTabelWilayah = doc.lastAutoTable.finalY || 0;
+
+    if (akhirTabelWilayah > 150) {
+      doc.addPage();
+    }
+
+    autoTable(doc, {
+      startY: akhirTabelWilayah > 150 ? 18 : akhirTabelWilayah + 10,
+      theme: "grid",
+      head: [["No", "Periode", "Prediksi TES", "Aktual", "MAPE", "Status"]],
+      body: dataPrediksi.map((item, index) => [
+        index + 1,
+        formatPeriode(item.periode),
+        item.prediksi,
+        item.aktual,
+        item.mape,
+        item.status,
+      ]),
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [16, 185, 129],
+        textColor: 255,
+      },
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    });
+
+    const jumlahHalaman = doc.internal.getNumberOfPages();
+
+    for (let i = 1; i <= jumlahHalaman; i += 1) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.text(
+        `GeoPanen - Halaman ${i} dari ${jumlahHalaman}`,
+        pageWidth - 60,
+        doc.internal.pageSize.getHeight() - 8
+      );
+    }
+
+    doc.save(`laporan-geopanen-${namaFileAman(dataTes.periode)}.pdf`);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-slate-950 text-white">
+        <Sidebar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-emerald-400">
+              Memuat Laporan Monitoring...
+            </h2>
+            <p className="text-sm text-slate-400 mt-2">
+              Mengambil data TES, MAPE, cuaca, risiko, dan rekomendasi.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-slate-950 text-white">
+        <Sidebar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="bg-slate-900 border border-red-700 rounded-2xl p-6 max-w-md">
+            <h2 className="text-xl font-bold text-red-400">
+              Gagal Memuat Laporan
+            </h2>
+            <p className="text-sm text-slate-300 mt-2">{error}</p>
+            <button
+              onClick={loadData}
+              className="mt-4 bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl text-sm font-semibold"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-slate-950 text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
-        {/* TOPBAR */}
-        <div className="min-h-16 bg-white border-b border-slate-100 px-8 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+      <main className="flex-1 min-w-0 h-screen overflow-hidden">
+        {/* HEADER */}
+        <div className="h-[73px] px-6 py-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
           <div>
-            <h2 className="font-bold text-slate-800">
-              Laporan Admin GeoPanen
-            </h2>
-            <p className="text-xs text-slate-500">
-              Rekap prediksi TES, evaluasi aktual, MAPE, akurasi, dan status
-              model.
+            <h1 className="text-xl font-bold">
+              Laporan Monitoring GeoPanen
+            </h1>
+            <p className="text-sm text-slate-400">
+              Rekap prediksi TES, evaluasi MAPE, cuaca, risiko wilayah, dan
+              rekomendasi.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
-              onClick={exportPDF}
-              className="flex items-center gap-2 bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-700 transition shadow-sm"
+              onClick={handleExportPdf}
+              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold"
             >
-              <Download size={16} />
               Export PDF
             </button>
 
             <button
-              onClick={exportExcel}
-              className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm"
+              onClick={handleExportExcel}
+              className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl text-sm font-semibold"
             >
-              <Download size={16} />
               Export Excel
             </button>
 
             <button
-              onClick={getLaporanTes}
-              disabled={loading}
-              className="flex items-center gap-2 border border-slate-200 px-4 py-2.5 rounded-xl text-sm hover:bg-slate-50 transition disabled:opacity-60"
+              onClick={loadData}
+              className="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-sm font-semibold"
             >
-              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-              {loading ? "Memuat..." : "Refresh"}
+              Refresh
             </button>
           </div>
         </div>
 
-        {/* HERO */}
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <div>
-              <p className="text-green-100 text-sm mb-2">
-                Rekapitulasi Sistem Prediksi Panen
-              </p>
+        <div className="h-[calc(100vh-73px)] overflow-y-auto">
+          {/* TITLE REPORT */}
+          <section className="bg-slate-950 border-b border-slate-800 px-6 py-6">
+            <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6">
+              <div>
+                <p className="text-sm text-emerald-400 font-semibold">
+                  Laporan Khusus
+                </p>
+                <h2 className="text-3xl font-bold mt-2">
+                  Laporan Prediksi dan Monitoring Panen Padi
+                </h2>
+                <p className="text-sm text-slate-400 mt-3 max-w-3xl leading-relaxed">
+                  Laporan ini menampilkan hasil prediksi panen padi Kabupaten
+                  Sukoharjo menggunakan TES, evaluasi aktual melalui MAPE,
+                  kondisi cuaca kecamatan, risiko wilayah, dan rekomendasi
+                  monitoring.
+                </p>
+              </div>
 
-              <h1 className="text-3xl font-bold">Laporan Prediksi TES</h1>
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 min-w-[300px]">
+                <p className="text-xs text-slate-400">Status Laporan</p>
+                <div className="flex justify-between items-center mt-2">
+                  <h3 className="text-xl font-bold">Data TES Tersedia</h3>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-semibold ${warnaTextStatus(
+                      dataTes.status
+                    )}`}
+                    style={{
+                      backgroundColor: `${warnaStatus(dataTes.status)}30`,
+                    }}
+                  >
+                    {dataTes.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Periode prediksi: {periodeTampil}
+                </p>
+              </div>
+            </div>
+          </section>
 
-              <p className="text-green-100 mt-2 max-w-3xl text-sm leading-relaxed">
-                Laporan sistem prediksi produksi padi berbasis Triple
-                Exponential Smoothing, meliputi hasil prediksi, evaluasi aktual,
-                MAPE, akurasi, dan status model.
+          <div className="p-6 space-y-6">
+            {/* RINGKASAN UTAMA */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <p className="text-sm text-slate-400">Prediksi Panen</p>
+                <h3 className="text-2xl font-bold text-emerald-400 mt-2">
+                  {dataTes.prediksi}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">{periodeTampil}</p>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <p className="text-sm text-slate-400">Aktual Produksi</p>
+                <h3 className="text-2xl font-bold text-white mt-2">
+                  {dataTes.aktual}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Data aktual pembanding
+                </p>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <p className="text-sm text-slate-400">MAPE</p>
+                <h3 className="text-2xl font-bold text-yellow-300 mt-2">
+                  {dataTes.mape}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Rata-rata error evaluasi
+                </p>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <p className="text-sm text-slate-400">Status Model</p>
+                <h3
+                  className={`text-2xl font-bold mt-2 ${warnaTextStatus(
+                    dataTes.status
+                  )}`}
+                >
+                  {dataTes.status}
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Berdasarkan nilai MAPE
+                </p>
+              </div>
+            </div>
+
+            {/* KESIMPULAN */}
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5">
+              <h3 className="font-bold text-white mb-2">
+                Kesimpulan Laporan Sistem
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {kesimpulanUmum}
               </p>
             </div>
 
-            <div className="bg-white/15 border border-white/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center">
-                  <Leaf size={22} />
+            {/* REPORT CUSTOM */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-800 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold">
+                    Laporan Monitoring Wilayah
+                  </h3>
+                  <p className="text-sm text-slate-400">
+                    Format laporan seperti laporan khusus: kecamatan, prediksi,
+                    cuaca, risiko, dan rekomendasi.
+                  </p>
                 </div>
 
-                <div>
-                  <p className="text-sm text-green-100">Status Laporan</p>
-                  <h3 className="font-bold">
-                    {loading ? "Memuat Data" : "Data TES Tersedia"}
-                  </h3>
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder="Cari kecamatan..."
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-slate-500"
+                  />
+
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none"
+                  >
+                    <option value="Semua">Semua Status</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Cukup">Cukup</option>
+                    <option value="Perlu Evaluasi">Perlu Evaluasi</option>
+                  </select>
+
+                  <select
+                    value={filterRisiko}
+                    onChange={(e) => setFilterRisiko(e.target.value)}
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none"
+                  >
+                    <option value="Semua">Semua Risiko</option>
+                    <option value="Rendah">Rendah</option>
+                    <option value="Sedang">Sedang</option>
+                    <option value="Tinggi">Tinggi</option>
+                  </select>
                 </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-800 text-slate-300">
+                    <tr>
+                      <th className="px-4 py-4 text-left min-w-[170px]">
+                        Wilayah
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[120px]">
+                        Tanaman
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[150px]">
+                        Periode
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[150px]">
+                        Prediksi TES
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[140px]">
+                        Aktual
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[110px]">
+                        MAPE
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[140px]">
+                        Status
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[110px]">
+                        Suhu
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[130px]">
+                        Kelembaban
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[160px]">
+                        Cuaca
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[120px]">
+                        Risiko
+                      </th>
+                      <th className="px-4 py-4 text-left min-w-[320px]">
+                        Rekomendasi
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {dataWilayahTampil.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="12"
+                          className="px-4 py-8 text-center text-slate-400"
+                        >
+                          Data wilayah tidak ditemukan.
+                        </td>
+                      </tr>
+                    ) : (
+                      dataWilayahTampil.map((item, index) => (
+                        <tr
+                          key={`${item.nama}-${index}`}
+                          className="border-t border-slate-800 hover:bg-slate-800/60"
+                        >
+                          <td className="px-4 py-4">
+                            <div>
+                              <p className="font-bold text-white">
+                                {item.nama}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                Sukoharjo
+                              </p>
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-4">Padi</td>
+
+                          <td className="px-4 py-4">{periodeTampil}</td>
+
+                          <td className="px-4 py-4 font-semibold text-emerald-300">
+                            {item.prediksi || dataTes.prediksi || "-"}
+                          </td>
+
+                          <td className="px-4 py-4">
+                            {item.aktual || dataTes.aktual || "-"}
+                          </td>
+
+                          <td className="px-4 py-4 font-semibold text-yellow-300">
+                            {item.mape || dataTes.mape || "-"}
+                          </td>
+
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${warnaTextStatus(
+                                item.status
+                              )}`}
+                              style={{
+                                backgroundColor: `${warnaStatus(
+                                  item.status
+                                )}30`,
+                              }}
+                            >
+                              {item.status || "-"}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-4">{item.suhu || "-"}</td>
+
+                          <td className="px-4 py-4">
+                            {item.kelembaban || "-"}
+                          </td>
+
+                          <td className="px-4 py-4">{item.kondisi || "-"}</td>
+
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${warnaTextRisiko(
+                                item.risiko
+                              )}`}
+                              style={{
+                                backgroundColor: `${warnaRisiko(
+                                  item.risiko
+                                )}30`,
+                              }}
+                            >
+                              {item.risiko || "-"}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-4 text-slate-300 leading-relaxed">
+                            {item.kesimpulan_monitoring ||
+                              item.rekomendasi ||
+                              "-"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* DETAIL PREDIKSI BULANAN */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-slate-800">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-bold">
+                      Detail Prediksi Bulanan TES
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Rekap hasil prediksi dan evaluasi aktual per periode.
+                    </p>
+                  </div>
+
+                  <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full">
+                    {dataPrediksi.length} Data
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-800 text-slate-300">
+                    <tr>
+                      <th className="px-4 py-4 text-left">No</th>
+                      <th className="px-4 py-4 text-left">Periode</th>
+                      <th className="px-4 py-4 text-left">Prediksi TES</th>
+                      <th className="px-4 py-4 text-left">Aktual</th>
+                      <th className="px-4 py-4 text-left">MAPE</th>
+                      <th className="px-4 py-4 text-left">Status</th>
+                      <th className="px-4 py-4 text-left">Kategori</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {dataPrediksi.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="7"
+                          className="px-4 py-8 text-center text-slate-400"
+                        >
+                          Data prediksi belum tersedia.
+                        </td>
+                      </tr>
+                    ) : (
+                      dataPrediksi.map((item, index) => (
+                        <tr
+                          key={`${item.periode}-${index}`}
+                          className="border-t border-slate-800 hover:bg-slate-800/60"
+                        >
+                          <td className="px-4 py-4">{index + 1}</td>
+                          <td className="px-4 py-4 font-semibold">
+                            {formatPeriode(item.periode)}
+                          </td>
+                          <td className="px-4 py-4 text-emerald-300 font-semibold">
+                            {item.prediksi}
+                          </td>
+                          <td className="px-4 py-4">{item.aktual}</td>
+                          <td className="px-4 py-4 text-yellow-300 font-semibold">
+                            {item.mape}
+                          </td>
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-semibold ${warnaTextStatus(
+                                item.status
+                              )}`}
+                              style={{
+                                backgroundColor: `${warnaStatus(
+                                  item.status
+                                )}30`,
+                              }}
+                            >
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">{item.kategori}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* CATATAN */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+              <h3 className="font-bold text-white mb-3">Catatan Laporan</h3>
+              <div className="space-y-2 text-sm text-slate-300 leading-relaxed">
+                <p>
+                  1. Prediksi panen dihitung menggunakan metode Triple
+                  Exponential Smoothing berdasarkan data historis produksi
+                  bulanan.
+                </p>
+                <p>
+                  2. Nilai MAPE digunakan untuk mengevaluasi selisih antara
+                  prediksi dan data aktual.
+                </p>
+                <p>
+                  3. Cuaca tidak menjadi input langsung pada rumus TES, tetapi
+                  digunakan untuk menentukan risiko wilayah dan rekomendasi
+                  monitoring.
+                </p>
+                <p>
+                  4. Laporan ini digunakan admin sebagai rekap sistem prediksi,
+                  evaluasi, dan pemantauan wilayah Sukoharjo.
+                </p>
               </div>
             </div>
           </div>
-        </section>
-
-        {/* CONTENT */}
-        <section className="-mt-16 px-8 pb-8 space-y-6">
-          {loading && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-              <RefreshCw
-                size={34}
-                className="animate-spin mx-auto text-emerald-600 mb-4"
-              />
-              <h2 className="text-xl font-bold text-slate-800">
-                Memuat Laporan TES...
-              </h2>
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-700 flex items-center justify-center shrink-0">
-                  <AlertTriangle size={24} />
-                </div>
-
-                <div>
-                  <h2 className="text-xl font-bold text-red-600">
-                    Gagal Memuat Data
-                  </h2>
-                  <p className="text-slate-600 mt-2">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!loading && !error && (
-            <>
-              {/* RINGKASAN UTAMA */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                <StatCard
-                  title="Data Historis TES"
-                  value={`${ringkasanPrediksi?.jumlahDataHistoris || 0} Data`}
-                  subtitle="Data produksi bulanan"
-                  icon={Database}
-                  tone="blue"
-                />
-
-                <StatCard
-                  title="Prediksi Mendatang"
-                  value={`${prediksiMendatang.length} Periode`}
-                  subtitle="Hasil prediksi TES"
-                  icon={TrendingUp}
-                  tone="emerald"
-                />
-
-                <StatCard
-                  title="MAPE Aktual"
-                  value={`${formatAngka(ringkasanEvaluasi?.mape)}%`}
-                  subtitle="Rata-rata error evaluasi"
-                  icon={Percent}
-                  tone="orange"
-                />
-
-                <StatCard
-                  title="Estimasi Akurasi"
-                  value={`${formatAngka(
-                    ringkasanEvaluasi?.estimasiAkurasi
-                  )}%`}
-                  subtitle="Berdasarkan data aktual"
-                  icon={Target}
-                  tone="green"
-                />
-              </div>
-
-              {/* STATUS DAN PREDIKSI */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-                <InsightCard
-                  title="Status Model"
-                  value={statusModel.label}
-                  subtitle="Kategori performa TES"
-                  icon={Gauge}
-                  tone={statusModel.tone}
-                />
-
-                <InsightCard
-                  title="Prediksi Berikutnya"
-                  value={
-                    prediksiPeriodeBerikutnya
-                      ? `${formatAngka(prediksiPeriodeBerikutnya.prediksi)} Ton`
-                      : "-"
-                  }
-                  subtitle={
-                    prediksiPeriodeBerikutnya
-                      ? `${namaBulan(prediksiPeriodeBerikutnya.bulan)} ${
-                          prediksiPeriodeBerikutnya.tahun
-                        }`
-                      : "Belum tersedia"
-                  }
-                  icon={CalendarDays}
-                  tone="blue"
-                />
-
-                <InsightCard
-                  title="Prediksi Tertinggi"
-                  value={
-                    prediksiTertinggi
-                      ? `${formatAngka(prediksiTertinggi.prediksi)} Ton`
-                      : "-"
-                  }
-                  subtitle={
-                    prediksiTertinggi
-                      ? `${namaBulan(prediksiTertinggi.bulan)} ${
-                          prediksiTertinggi.tahun
-                        }`
-                      : "Belum tersedia"
-                  }
-                  icon={CheckCircle}
-                  tone="emerald"
-                />
-
-                <InsightCard
-                  title="Prediksi Terendah"
-                  value={
-                    prediksiTerendah
-                      ? `${formatAngka(prediksiTerendah.prediksi)} Ton`
-                      : "-"
-                  }
-                  subtitle={
-                    prediksiTerendah
-                      ? `${namaBulan(prediksiTerendah.bulan)} ${
-                          prediksiTerendah.tahun
-                        }`
-                      : "Belum tersedia"
-                  }
-                  icon={AlertTriangle}
-                  tone="red"
-                />
-              </div>
-
-              {/* KESIMPULAN */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <Info size={23} />
-                  </div>
-
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-800 mb-3">
-                      Kesimpulan Laporan Sistem
-                    </h2>
-
-                    <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                      <p className="text-sm text-emerald-700 leading-relaxed">
-                        {kesimpulan}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TABEL PREDIKSI TES */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <h2 className="font-bold text-slate-800">
-                      Tabel Hasil Prediksi TES
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      Menampilkan hasil prediksi produksi padi periode
-                      mendatang.
-                    </p>
-                  </div>
-
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-                    {prediksiMendatang.length} Data
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
-                      <tr>
-                        <th className="text-left font-semibold px-6 py-4">No</th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Periode
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Prediksi TES
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Kategori
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Status Evaluasi
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {prediksiMendatang.length > 0 ? (
-                        prediksiMendatang.map((item, index) => {
-                          const kategori = getKategoriPrediksi(item.prediksi);
-
-                          const sudahDievaluasi = periodeEvaluasiSet.has(
-                            `${Number(item.tahun)}-${Number(item.bulan)}`
-                          );
-
-                          return (
-                            <tr
-                              key={`${item.bulan}-${item.tahun}-${index}`}
-                              className="border-t border-slate-100 hover:bg-slate-50 transition"
-                            >
-                              <td className="px-6 py-4 text-slate-500">
-                                {index + 1}
-                              </td>
-
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                                    <FileSpreadsheet size={18} />
-                                  </div>
-
-                                  <div>
-                                    <p className="font-semibold text-slate-800">
-                                      {namaBulan(item.bulan)} {item.tahun}
-                                    </p>
-                                    <p className="text-xs text-slate-400">
-                                      Periode prediksi TES
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-
-                              <td className="px-6 py-4 font-bold text-emerald-700">
-                                {formatAngka(item.prediksi)} Ton
-                              </td>
-
-                              <td className="px-6 py-4">
-                                <span
-                                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${getKategoriBadge(
-                                    kategori
-                                  )}`}
-                                >
-                                  {kategori}
-                                </span>
-                              </td>
-
-                              <td className="px-6 py-4">
-                                <span
-                                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                                    sudahDievaluasi
-                                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                      : "bg-slate-50 text-slate-600 border-slate-100"
-                                  }`}
-                                >
-                                  {sudahDievaluasi
-                                    ? "Sudah Dievaluasi"
-                                    : "Belum Dievaluasi"}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan="5"
-                            className="px-6 py-10 text-center text-slate-500"
-                          >
-                            Belum ada data prediksi TES.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* TABEL EVALUASI TES */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <h2 className="font-bold text-slate-800">
-                      Tabel Evaluasi Aktual TES
-                    </h2>
-                    <p className="text-sm text-slate-500">
-                      Perbandingan hasil prediksi dengan data aktual produksi
-                      bulanan.
-                    </p>
-                  </div>
-
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-                    {evaluasiTes.length} Data
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
-                      <tr>
-                        <th className="text-left font-semibold px-6 py-4">No</th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Periode
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Aktual
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Prediksi
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Selisih
-                        </th>
-                        <th className="text-left font-semibold px-6 py-4">APE</th>
-                        <th className="text-left font-semibold px-6 py-4">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {evaluasiTes.length > 0 ? (
-                        evaluasiTes.map((item, index) => (
-                          <tr
-                            key={`${item.bulan}-${item.tahun}-${index}`}
-                            className="border-t border-slate-100 hover:bg-slate-50 transition"
-                          >
-                            <td className="px-6 py-4 text-slate-500">
-                              {index + 1}
-                            </td>
-
-                            <td className="px-6 py-4 font-semibold text-slate-800">
-                              {namaBulan(item.bulan)} {item.tahun}
-                            </td>
-
-                            <td className="px-6 py-4 text-slate-600">
-                              {formatAngka(item.aktual)} Ton
-                            </td>
-
-                            <td className="px-6 py-4 text-slate-600">
-                              {formatAngka(item.prediksi)} Ton
-                            </td>
-
-                            <td
-                              className={`px-6 py-4 font-semibold ${
-                                Number(item.selisih) < 0
-                                  ? "text-red-600"
-                                  : "text-emerald-700"
-                              }`}
-                            >
-                              {formatAngka(item.selisih)} Ton
-                            </td>
-
-                            <td className="px-6 py-4 font-semibold text-slate-700">
-                              {formatAngka(item.ape)}%
-                            </td>
-
-                            <td className="px-6 py-4">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                                  item.status === "Akurat"
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                    : item.status === "Cukup"
-                                    ? "bg-yellow-50 text-yellow-700 border-yellow-100"
-                                    : "bg-red-50 text-red-700 border-red-100"
-                                }`}
-                              >
-                                {item.status || "-"}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan="7"
-                            className="px-6 py-10 text-center text-slate-500"
-                          >
-                            Belum ada data evaluasi aktual TES.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
-          )}
-        </section>
+        </div>
       </main>
-    </div>
-  );
-}
-
-function StatCard({ title, value, subtitle, icon: Icon, tone }) {
-  const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    green: "bg-green-100 text-green-700",
-    blue: "bg-blue-100 text-blue-700",
-    orange: "bg-orange-100 text-orange-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    red: "bg-red-100 text-red-700",
-  };
-
-  return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
-      <div className="flex justify-between items-start gap-4">
-        <div className="min-w-0">
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-xl font-bold text-slate-800 mt-2 break-words">
-            {value}
-          </h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
-        </div>
-
-        <div
-          className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-            toneClass[tone] || toneClass.emerald
-          }`}
-        >
-          <Icon size={21} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
-  const toneClass = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    yellow: "bg-yellow-50 text-yellow-700 border-yellow-100",
-    red: "bg-red-50 text-red-700 border-red-100",
-    blue: "bg-blue-50 text-blue-700 border-blue-100",
-  };
-
-  return (
-    <div
-      className={`rounded-2xl border p-5 ${
-        toneClass[tone] || toneClass.emerald
-      }`}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium opacity-90">{title}</p>
-          <h2 className="text-xl font-bold mt-2">{value}</h2>
-          <p className="text-xs mt-1 opacity-80">{subtitle}</p>
-        </div>
-
-        <div className="w-10 h-10 rounded-xl bg-white/70 flex items-center justify-center shrink-0">
-          <Icon size={20} />
-        </div>
-      </div>
     </div>
   );
 }

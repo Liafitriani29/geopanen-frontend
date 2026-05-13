@@ -138,15 +138,15 @@ export default function Prediksi() {
       : null;
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-[#020617]">
         {/* TOPBAR */}
-        <div className="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between">
+        <div className="h-16 bg-[#081226] border-b border-slate-800 px-8 flex items-center justify-between">
           <div>
-            <h2 className="font-bold text-slate-800">Prediksi Panen TES</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="font-bold text-white">Analisis Prediksi TES</h2>
+            <p className="text-xs text-slate-400">
               Perhitungan prediksi produksi padi Sukoharjo dengan metode Triple
               Exponential Smoothing.
             </p>
@@ -155,7 +155,7 @@ export default function Prediksi() {
           <button
             onClick={hitungPrediksiTES}
             disabled={loading}
-            className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-cyan-700 transition shadow-lg shadow-cyan-950/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -172,10 +172,10 @@ export default function Prediksi() {
         </div>
 
         {/* HERO */}
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
+        <section className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] border-b border-slate-800 px-8 pt-8 pb-24 text-white">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div>
-              <p className="text-green-100 text-sm mb-2">
+              <p className="text-cyan-300 text-sm mb-2">
                 Forecasting Produksi Padi
               </p>
 
@@ -183,22 +183,26 @@ export default function Prediksi() {
                 Prediksi Produksi Padi Sukoharjo
               </h1>
 
-              <p className="text-green-100 mt-2 max-w-3xl text-sm leading-relaxed">
+              <p className="text-slate-300 mt-2 max-w-3xl text-sm leading-relaxed">
                 Sistem menghitung prediksi produksi padi menggunakan metode
                 Triple Exponential Smoothing berdasarkan data produksi bulanan
                 tahun 2021–2024.
               </p>
             </div>
 
-            <div className="bg-white/15 border border-white/20 rounded-2xl p-4 min-w-[240px] backdrop-blur-sm">
+            <div className="bg-white/5 border border-cyan-500/20 rounded-2xl p-4 min-w-[250px] backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center">
                   <Leaf size={22} />
                 </div>
 
                 <div>
-                  <p className="text-sm text-green-100">Status Perhitungan</p>
-                  <h3 className="font-bold">
+                  <p className="text-sm text-slate-400">Status Perhitungan</p>
+                  <h3
+                    className={`font-bold ${
+                      sudahDihitung ? "text-emerald-300" : "text-yellow-300"
+                    }`}
+                  >
                     {sudahDihitung ? "Sudah Dihitung" : "Belum Dihitung"}
                   </h3>
                 </div>
@@ -208,18 +212,18 @@ export default function Prediksi() {
         </section>
 
         {/* CONTENT */}
-        <section className="-mt-16 px-8 pb-8 space-y-6">
+        <section className="-mt-16 px-8 pb-8 space-y-6 h-[calc(100vh-64px)] overflow-y-auto">
           {!sudahDihitung && !loading && !error && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-5">
+            <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-10 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
                 <Calculator size={30} />
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800 mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Prediksi Belum Dihitung
               </h2>
 
-              <p className="text-slate-500 text-sm mb-6 max-w-xl mx-auto">
+              <p className="text-slate-400 text-sm mb-6 max-w-xl mx-auto leading-relaxed">
                 Klik tombol <b>Hitung Prediksi</b> untuk menampilkan ringkasan,
                 grafik aktual vs prediksi, hasil prediksi 2025, dan data
                 historis produksi.
@@ -227,7 +231,7 @@ export default function Prediksi() {
 
               <button
                 onClick={hitungPrediksiTES}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 shadow-sm transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-xl font-semibold hover:bg-cyan-700 shadow-lg shadow-cyan-950/30 transition"
               >
                 <Calculator size={18} />
                 Hitung Prediksi Sekarang
@@ -236,16 +240,16 @@ export default function Prediksi() {
           )}
 
           {loading && (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-5">
+            <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-10 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
                 <RefreshCw size={30} className="animate-spin" />
               </div>
 
-              <h2 className="text-xl font-bold text-slate-800 mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Sedang Menghitung Prediksi...
               </h2>
 
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Sistem sedang mengambil data historis dan menjalankan metode
                 Triple Exponential Smoothing.
               </p>
@@ -253,22 +257,25 @@ export default function Prediksi() {
           )}
 
           {error && (
-            <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6">
+            <div className="bg-red-500/10 rounded-2xl border border-red-500/30 shadow-lg shadow-black/20 p-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-50 text-red-700 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-300 border border-red-500/20 flex items-center justify-center shrink-0">
                   <AlertTriangle size={24} />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-red-600">
+                  <h2 className="text-xl font-bold text-red-300">
                     Gagal Menghitung Prediksi
                   </h2>
 
-                  <p className="text-slate-600 mt-2">{error}</p>
+                  <p className="text-red-100/80 mt-2">{error}</p>
 
-                  <p className="text-sm text-slate-500 mt-3">
+                  <p className="text-sm text-slate-400 mt-3">
                     Pastikan backend Laravel sudah berjalan dengan perintah{" "}
-                    <span className="font-semibold">php artisan serve</span>.
+                    <span className="font-semibold text-slate-200">
+                      php artisan serve
+                    </span>
+                    .
                   </p>
                 </div>
               </div>
@@ -284,6 +291,7 @@ export default function Prediksi() {
                   value={`${ringkasan?.jumlahDataHistoris ?? 48} Data`}
                   subtitle="Data produksi bulanan"
                   icon={Database}
+                  tone="emerald"
                 />
 
                 <StatCard
@@ -291,6 +299,7 @@ export default function Prediksi() {
                   value={`${formatAngka(ringkasan?.mape ?? 0)}%`}
                   subtitle="Rata-rata kesalahan prediksi"
                   icon={Percent}
+                  tone="yellow"
                 />
 
                 <StatCard
@@ -298,6 +307,7 @@ export default function Prediksi() {
                   value={`${formatAngka(ringkasan?.estimasiAkurasi ?? 0)}%`}
                   subtitle="Berdasarkan nilai MAPE"
                   icon={Target}
+                  tone="cyan"
                 />
 
                 <StatCard
@@ -315,6 +325,7 @@ export default function Prediksi() {
                       : "Belum tersedia"
                   }
                   icon={CalendarDays}
+                  tone="blue"
                 />
               </div>
 
@@ -369,16 +380,16 @@ export default function Prediksi() {
               <Card title="Grafik Aktual dan Prediksi TES">
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-bold text-slate-800">
+                    <h3 className="font-bold text-white">
                       Perbandingan Aktual dan Prediksi
                     </h3>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-400 mt-1">
                       Grafik batang menampilkan perbandingan data aktual
                       terakhir dan prediksi produksi padi mendatang.
                     </p>
                   </div>
 
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                     TES
                   </span>
                 </div>
@@ -399,7 +410,7 @@ export default function Prediksi() {
                       <CartesianGrid
                         strokeDasharray="3 3"
                         vertical={false}
-                        stroke="#e5e7eb"
+                        stroke="#1e293b"
                       />
 
                       <XAxis
@@ -408,23 +419,28 @@ export default function Prediksi() {
                         angle={-35}
                         textAnchor="end"
                         height={70}
-                        tick={{ fontSize: 11, fill: "#64748b" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
 
                       <YAxis
-                        tick={{ fontSize: 12, fill: "#64748b" }}
+                        tick={{ fontSize: 12, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
 
                       <Tooltip
                         contentStyle={{
+                          backgroundColor: "#0f172a",
                           borderRadius: "14px",
-                          border: "1px solid #d1fae5",
-                          boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+                          border: "1px solid #1e293b",
+                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
                           fontSize: "13px",
+                          color: "#e2e8f0",
+                        }}
+                        labelStyle={{
+                          color: "#e2e8f0",
                         }}
                         formatter={(value, name) => [
                           value === null ? "-" : `${formatAngka(value)} Ton`,
@@ -433,19 +449,24 @@ export default function Prediksi() {
                         labelFormatter={(label) => `Periode: ${label}`}
                       />
 
-                      <Legend />
+                      <Legend
+                        wrapperStyle={{
+                          color: "#cbd5e1",
+                          fontSize: "12px",
+                        }}
+                      />
 
                       <Bar
                         dataKey="aktual"
                         name="Aktual Bulanan"
-                        fill="#059669"
+                        fill="#06b6d4"
                         radius={[8, 8, 0, 0]}
                       />
 
                       <Bar
                         dataKey="prediksi"
                         name="Prediksi TES"
-                        fill="#84cc16"
+                        fill="#22c55e"
                         radius={[8, 8, 0, 0]}
                       />
                     </BarChart>
@@ -455,72 +476,96 @@ export default function Prediksi() {
 
               {/* PREDIKSI 2025 CARD */}
               <Card title="Hasil Prediksi Produksi Padi 2025">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {prediksiMendatang.map((item, index) => (
-                    <div
-                      key={`${item.bulan}-${item.tahun}-${index}`}
-                      className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 hover:-translate-y-1 transition"
-                    >
-                      <p className="text-sm text-emerald-700 font-semibold">
-                        {namaBulan(item.bulan)} {item.tahun}
-                      </p>
+                {prediksiMendatang.length === 0 ? (
+                  <div className="rounded-2xl border border-slate-800 bg-[#0b1220] p-6 text-center text-slate-400">
+                    Data prediksi mendatang belum tersedia.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {prediksiMendatang.map((item, index) => (
+                      <div
+                        key={`${item.bulan}-${item.tahun}-${index}`}
+                        className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 hover:-translate-y-1 transition shadow-lg shadow-black/10"
+                      >
+                        <p className="text-sm text-cyan-300 font-semibold">
+                          {namaBulan(item.bulan)} {item.tahun}
+                        </p>
 
-                      <h3 className="text-xl font-bold text-emerald-900 mt-2">
-                        {formatAngka(item.prediksi)}
-                      </h3>
+                        <h3 className="text-xl font-bold text-white mt-2">
+                          {formatAngka(item.prediksi)}
+                        </h3>
 
-                      <p className="text-xs text-emerald-600 mt-1">
-                        Ton produksi padi
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Ton produksi padi
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </Card>
 
               {/* DATA HISTORIS */}
               <Card title="Data Historis Produksi Padi">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-400">
                     Menampilkan {dataHistoris.length} dari {evaluasi.length}{" "}
                     data historis produksi.
                   </p>
 
                   <button
                     onClick={() => setLihatSemuaHistoris(!lihatSemuaHistoris)}
-                    className="px-4 py-2 rounded-xl border border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-sm font-semibold"
+                    className="px-4 py-2 rounded-xl border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 text-sm font-semibold transition"
                   >
                     {lihatSemuaHistoris ? "Tampilkan Ringkas" : "Lihat Semua"}
                   </button>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border border-slate-100">
-                    <thead className="bg-emerald-600 text-white">
+                  <table className="w-full text-sm border border-slate-800 rounded-xl overflow-hidden">
+                    <thead className="bg-[#0b1220] text-slate-300">
                       <tr>
-                        <th className="px-4 py-3 border text-left">No</th>
-                        <th className="px-4 py-3 border text-left">Periode</th>
-                        <th className="px-4 py-3 border text-right">
+                        <th className="px-4 py-3 border border-slate-800 text-left">
+                          No
+                        </th>
+                        <th className="px-4 py-3 border border-slate-800 text-left">
+                          Periode
+                        </th>
+                        <th className="px-4 py-3 border border-slate-800 text-right">
                           Produksi Aktual (ton)
                         </th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      {dataHistoris.map((item, index) => (
-                        <tr key={index} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 border border-slate-100">
-                            {index + 1}
-                          </td>
+                      {dataHistoris.length > 0 ? (
+                        dataHistoris.map((item, index) => (
+                          <tr
+                            key={index}
+                            className="hover:bg-slate-800/60 transition"
+                          >
+                            <td className="px-4 py-3 border border-slate-800 text-slate-400">
+                              {index + 1}
+                            </td>
 
-                          <td className="px-4 py-3 border border-slate-100">
-                            {namaBulan(item.bulan)} {item.tahun}
-                          </td>
+                            <td className="px-4 py-3 border border-slate-800 text-slate-300">
+                              {namaBulan(item.bulan)} {item.tahun}
+                            </td>
 
-                          <td className="px-4 py-3 border border-slate-100 text-right font-semibold text-slate-700">
-                            {formatAngka(item.aktual)}
+                            <td className="px-4 py-3 border border-slate-800 text-right font-semibold text-emerald-300">
+                              {formatAngka(item.aktual)}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="3"
+                            className="px-4 py-8 text-center text-slate-500 border border-slate-800"
+                          >
+                            Data historis belum tersedia.
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -535,8 +580,8 @@ export default function Prediksi() {
 
 function Card({ title, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 bg-emerald-600 text-white">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+      <div className="px-6 py-4 bg-[#0b1220] border-b border-slate-800 text-white">
         <h2 className="font-bold">{title}</h2>
       </div>
 
@@ -545,17 +590,29 @@ function Card({ title, children }) {
   );
 }
 
-function StatCard({ title, value, subtitle, icon: Icon }) {
+function StatCard({ title, value, subtitle, icon: Icon, tone }) {
+  const toneClass = {
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    cyan: "bg-cyan-500/10 text-cyan-300 border border-cyan-500/20",
+    yellow: "bg-yellow-500/10 text-yellow-300 border border-yellow-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border border-blue-500/20",
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-5 hover:-translate-y-1 transition">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-xl font-bold text-slate-800 mt-2">{value}</h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h3 className="text-xl font-bold text-white mt-2">{value}</h3>
+          <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
         </div>
 
-        <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+        <div
+          className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+            toneClass[tone] || toneClass.emerald
+          }`}
+        >
           <Icon size={21} />
         </div>
       </div>
@@ -565,14 +622,16 @@ function StatCard({ title, value, subtitle, icon: Icon }) {
 
 function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    yellow: "bg-yellow-50 text-yellow-700 border-yellow-100",
-    red: "bg-red-50 text-red-700 border-red-100",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    yellow:
+      "bg-yellow-500/10 text-yellow-300 border border-yellow-500/20",
+    red: "bg-red-500/10 text-red-300 border border-red-500/20",
   };
 
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`rounded-2xl p-5 shadow-lg shadow-black/10 ${
         toneClass[tone] || toneClass.emerald
       }`}
     >
@@ -583,7 +642,7 @@ function InsightCard({ title, value, subtitle, icon: Icon, tone }) {
           <p className="text-xs mt-1 opacity-80">{subtitle}</p>
         </div>
 
-        <div className="w-10 h-10 rounded-xl bg-white/70 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-black/20 flex items-center justify-center shrink-0">
           <Icon size={20} />
         </div>
       </div>

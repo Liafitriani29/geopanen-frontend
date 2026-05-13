@@ -272,20 +272,20 @@ export default function DataHistorisTES() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <div className="flex min-h-screen bg-[#020617] text-white">
       <Sidebar />
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden bg-[#020617]">
         {/* TOPBAR */}
-        <div className="h-16 bg-white border-b border-slate-100 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 w-[400px] bg-slate-50 border border-slate-100 rounded-xl px-4 py-2">
-            <Search size={18} className="text-slate-400" />
+        <div className="h-16 bg-[#081226] border-b border-slate-800 px-8 flex items-center justify-between">
+          <div className="flex items-center gap-3 w-[420px] bg-[#0b1220] border border-slate-800 rounded-xl px-4 py-2">
+            <Search size={18} className="text-slate-500" />
             <input
               type="text"
               placeholder="Cari tahun, bulan, kabupaten, produksi..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none text-sm w-full text-slate-600"
+              className="bg-transparent outline-none text-sm w-full text-slate-200 placeholder:text-slate-500"
             />
           </div>
 
@@ -293,7 +293,7 @@ export default function DataHistorisTES() {
             <select
               value={filterTahun}
               onChange={(e) => setFilterTahun(e.target.value)}
-              className="border border-slate-200 bg-white px-4 py-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+              className="border border-slate-800 bg-[#0b1220] text-slate-200 px-4 py-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-cyan-500/30"
             >
               {tahunList.map((tahun) => (
                 <option key={tahun} value={tahun}>
@@ -304,7 +304,7 @@ export default function DataHistorisTES() {
 
             <button
               onClick={fetchData}
-              className="flex items-center gap-2 border border-slate-200 px-4 py-2 rounded-xl text-sm hover:bg-slate-50 transition"
+              className="flex items-center gap-2 border border-slate-800 bg-[#0b1220] text-slate-200 px-4 py-2 rounded-xl text-sm hover:bg-slate-800 transition"
             >
               <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
               Refresh
@@ -312,7 +312,7 @@ export default function DataHistorisTES() {
 
             <button
               onClick={openTambahModal}
-              className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition shadow-sm"
+              className="flex items-center gap-2 bg-cyan-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-cyan-700 transition shadow-lg shadow-cyan-950/30"
             >
               <PlusCircle size={18} />
               Tambah Data
@@ -321,15 +321,15 @@ export default function DataHistorisTES() {
         </div>
 
         {/* HERO */}
-        <section className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-8 pt-8 pb-24 text-white">
+        <section className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] border-b border-slate-800 px-8 pt-8 pb-24 text-white">
           <div>
-            <p className="text-green-100 text-sm mb-2">
+            <p className="text-cyan-300 text-sm mb-2">
               Data Input Triple Exponential Smoothing
             </p>
 
             <h1 className="text-3xl font-bold">Data Historis TES</h1>
 
-            <p className="text-green-100 mt-2 max-w-3xl">
+            <p className="text-slate-300 mt-2 max-w-3xl leading-relaxed">
               Kelola data produksi bulanan periode 2021–2024 sebagai input
               perhitungan prediksi panen menggunakan metode Triple Exponential
               Smoothing. Data aktual tahun 2025 dimasukkan melalui menu Evaluasi
@@ -339,7 +339,7 @@ export default function DataHistorisTES() {
         </section>
 
         {/* CONTENT */}
-        <section className="-mt-16 px-8 pb-8 space-y-6">
+        <section className="-mt-16 px-8 pb-8 space-y-6 h-[calc(100vh-64px)] overflow-y-auto">
           {/* STAT CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             <StatCard
@@ -355,7 +355,7 @@ export default function DataHistorisTES() {
               value={`${tahunAwal}–${tahunAkhir}`}
               subtitle="Periode data historis"
               icon={CalendarRange}
-              tone="green"
+              tone="cyan"
             />
 
             <StatCard
@@ -381,16 +381,16 @@ export default function DataHistorisTES() {
 
           {/* WARNING DATA 2025 */}
           {dataTidakSesuai.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-100 rounded-2xl p-5 flex gap-4">
-              <div className="w-11 h-11 rounded-xl bg-white text-yellow-700 flex items-center justify-center shrink-0">
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-5 flex gap-4">
+              <div className="w-11 h-11 rounded-xl bg-yellow-500/10 text-yellow-300 border border-yellow-500/20 flex items-center justify-center shrink-0">
                 <AlertTriangle size={22} />
               </div>
 
               <div>
-                <h2 className="font-bold text-yellow-800 mb-1">
+                <h2 className="font-bold text-yellow-300 mb-1">
                   Ada Data Tahun 2025 di Data Historis TES
                 </h2>
-                <p className="text-sm text-yellow-700 leading-relaxed">
+                <p className="text-sm text-yellow-100/80 leading-relaxed">
                   Ditemukan {dataTidakSesuai.length} data tahun 2025 pada tabel
                   Data Historis TES. Untuk alur pengujian TA, data tahun 2025
                   sebaiknya dipindahkan ke menu Evaluasi Aktual TES, lalu
@@ -402,26 +402,26 @@ export default function DataHistorisTES() {
           )}
 
           {/* TABLE */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="font-bold text-slate-800">
+                <h2 className="font-bold text-white">
                   Daftar Produksi Bulanan Historis
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-400">
                   Menampilkan {dataTampil.length} dari {dataFiltered.length}{" "}
                   data historis produksi.
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-xs font-semibold">
                   {dataFiltered.length} Data
                 </span>
 
                 <button
                   onClick={() => setLihatSemuaData(!lihatSemuaData)}
-                  className="px-4 py-2 text-sm rounded-xl border border-emerald-200 text-emerald-700 hover:bg-emerald-50 font-semibold transition"
+                  className="px-4 py-2 text-sm rounded-xl border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-semibold transition"
                 >
                   {lihatSemuaData ? "Tampilkan Ringkas" : "Lihat Semua"}
                 </button>
@@ -430,7 +430,7 @@ export default function DataHistorisTES() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-500">
+                <thead className="bg-[#0b1220] text-slate-400">
                   <tr>
                     <th className="text-left font-semibold px-6 py-4">No</th>
                     <th className="text-left font-semibold px-6 py-4">
@@ -453,36 +453,38 @@ export default function DataHistorisTES() {
                     dataTampil.map((item, index) => (
                       <tr
                         key={item.id}
-                        className={`border-t border-slate-100 hover:bg-slate-50 transition ${
-                          Number(item.tahun) > 2024 ? "bg-yellow-50/40" : ""
+                        className={`border-t border-slate-800 hover:bg-slate-800/60 transition ${
+                          Number(item.tahun) > 2024
+                            ? "bg-yellow-500/5"
+                            : ""
                         }`}
                       >
-                        <td className="px-6 py-4 text-slate-500">
+                        <td className="px-6 py-4 text-slate-400">
                           {index + 1}
                         </td>
 
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
                                 Number(item.tahun) > 2024
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-emerald-100 text-emerald-700"
+                                  ? "bg-yellow-500/10 text-yellow-300 border-yellow-500/20"
+                                  : "bg-cyan-500/10 text-cyan-300 border-cyan-500/20"
                               }`}
                             >
                               <FileSpreadsheet size={18} />
                             </div>
 
                             <div>
-                              <p className="font-semibold text-slate-800">
+                              <p className="font-semibold text-white">
                                 {getNamaBulan(item.bulan)} {item.tahun}
                               </p>
-                              <p className="text-xs text-slate-400">
+                              <p className="text-xs text-slate-500">
                                 {item.periode || "Periode otomatis"}
                               </p>
 
                               {Number(item.tahun) > 2024 && (
-                                <p className="text-xs text-yellow-700 font-semibold mt-1">
+                                <p className="text-xs text-yellow-300 font-semibold mt-1">
                                   Seharusnya masuk ke Evaluasi Aktual TES
                                 </p>
                               )}
@@ -490,12 +492,12 @@ export default function DataHistorisTES() {
                           </div>
                         </td>
 
-                        <td className="px-6 py-4 text-slate-600">
+                        <td className="px-6 py-4 text-slate-300">
                           {item.kabupaten}
                         </td>
 
                         <td className="px-6 py-4">
-                          <span className="font-bold text-emerald-700">
+                          <span className="font-bold text-emerald-300">
                             {formatAngka(item.produksi)} Ton
                           </span>
                         </td>
@@ -504,7 +506,7 @@ export default function DataHistorisTES() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleEdit(item)}
-                              className="w-9 h-9 flex items-center justify-center rounded-xl border border-emerald-200 text-emerald-600 hover:bg-emerald-50 transition"
+                              className="w-9 h-9 flex items-center justify-center rounded-xl border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 transition"
                               title="Edit Data"
                             >
                               <Pencil size={17} />
@@ -512,7 +514,7 @@ export default function DataHistorisTES() {
 
                             <button
                               onClick={() => handleDelete(item.id)}
-                              className="w-9 h-9 flex items-center justify-center rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition"
+                              className="w-9 h-9 flex items-center justify-center rounded-xl border border-red-500/30 text-red-300 hover:bg-red-500/10 transition"
                               title="Hapus Data"
                             >
                               <Trash2 size={17} />
@@ -537,14 +539,14 @@ export default function DataHistorisTES() {
           </div>
 
           {/* CATATAN */}
-          <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl flex gap-4">
-            <div className="w-11 h-11 rounded-xl bg-white text-emerald-700 flex items-center justify-center shrink-0">
+          <div className="bg-emerald-500/10 border border-emerald-500/30 p-5 rounded-2xl flex gap-4">
+            <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center justify-center shrink-0">
               <Info size={22} />
             </div>
 
             <div>
-              <h2 className="font-bold text-emerald-800 mb-1">Catatan</h2>
-              <p className="text-sm text-emerald-700 leading-relaxed">
+              <h2 className="font-bold text-emerald-300 mb-1">Catatan</h2>
+              <p className="text-sm text-emerald-100/80 leading-relaxed">
                 Data ini adalah data historis produksi bulanan yang digunakan
                 sebagai input metode Triple Exponential Smoothing. Untuk alur
                 pengujian sistem, data historis sebaiknya berisi periode
@@ -558,23 +560,23 @@ export default function DataHistorisTES() {
 
         {/* MODAL */}
         {showModal && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex justify-center items-center z-50 px-4">
-            <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-700 via-green-600 to-lime-600 px-6 py-5 text-white flex justify-between items-center">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 px-4">
+            <div className="bg-[#081226] border border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-[#07111f] via-[#0f2d2e] to-[#123522] px-6 py-5 text-white flex justify-between items-center border-b border-slate-800">
                 <div>
                   <h2 className="text-xl font-bold">
                     {isEdit
                       ? "Edit Data Historis TES"
                       : "Tambah Data Historis TES"}
                   </h2>
-                  <p className="text-sm text-green-100 mt-1">
+                  <p className="text-sm text-slate-300 mt-1">
                     Lengkapi data produksi bulanan periode 2021–2024.
                   </p>
                 </div>
 
                 <button
                   onClick={() => setShowModal(false)}
-                  className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
                 >
                   <X size={20} />
                 </button>
@@ -582,7 +584,7 @@ export default function DataHistorisTES() {
 
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">
                     Kabupaten
                   </label>
                   <input
@@ -590,12 +592,12 @@ export default function DataHistorisTES() {
                     name="kabupaten"
                     value={form.kabupaten}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500/30 placeholder:text-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">
                     Tahun
                   </label>
                   <input
@@ -606,7 +608,7 @@ export default function DataHistorisTES() {
                     max="2024"
                     value={form.tahun}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500/30 placeholder:text-slate-500"
                   />
 
                   <p className="text-xs text-slate-500 mt-1">
@@ -617,14 +619,14 @@ export default function DataHistorisTES() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">
                     Bulan
                   </label>
                   <select
                     name="bulan"
                     value={form.bulan}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500/30"
                   >
                     <option value="">Pilih Bulan</option>
                     {bulanList.map((bulan) => (
@@ -636,7 +638,7 @@ export default function DataHistorisTES() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">
                     Produksi Bulanan (Ton)
                   </label>
                   <input
@@ -645,15 +647,15 @@ export default function DataHistorisTES() {
                     placeholder="Contoh: 30000"
                     value={form.produksi}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full px-4 py-3 bg-[#020617] border border-slate-800 rounded-xl text-sm text-white outline-none focus:ring-2 focus:ring-cyan-500/30 placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+              <div className="px-6 py-5 bg-[#0b1220] border-t border-slate-800 flex justify-end gap-3">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-white transition"
+                  className="px-5 py-2.5 border border-slate-700 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800 transition"
                 >
                   Batal
                 </button>
@@ -661,7 +663,7 @@ export default function DataHistorisTES() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition flex items-center gap-2 disabled:opacity-60"
+                  className="px-5 py-2.5 bg-cyan-600 text-white rounded-xl text-sm font-semibold hover:bg-cyan-700 transition flex items-center gap-2 disabled:opacity-60"
                 >
                   <Save size={17} />
                   {loading ? "Menyimpan..." : "Simpan"}
@@ -677,19 +679,20 @@ export default function DataHistorisTES() {
 
 function StatCard({ title, value, subtitle, icon: Icon, tone }) {
   const toneClass = {
-    emerald: "bg-emerald-100 text-emerald-700",
-    green: "bg-green-100 text-green-700",
-    lime: "bg-lime-100 text-lime-700",
-    blue: "bg-blue-100 text-blue-700",
+    emerald:
+      "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20",
+    cyan: "bg-cyan-500/10 text-cyan-300 border border-cyan-500/20",
+    lime: "bg-lime-500/10 text-lime-300 border border-lime-500/20",
+    blue: "bg-blue-500/10 text-blue-300 border border-blue-500/20",
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:-translate-y-1 transition">
+    <div className="bg-[#081226] rounded-2xl border border-slate-800 shadow-lg shadow-black/20 p-5 hover:-translate-y-1 transition">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-slate-500">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-800 mt-2">{value}</h3>
-          <p className="text-xs text-slate-400 mt-2">{subtitle}</p>
+          <p className="text-sm text-slate-400">{title}</p>
+          <h3 className="text-2xl font-bold text-white mt-2">{value}</h3>
+          <p className="text-xs text-slate-500 mt-2">{subtitle}</p>
         </div>
 
         <div
